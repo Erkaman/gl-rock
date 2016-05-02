@@ -14,8 +14,6 @@ uniform float uSpecularPower;
 uniform float uHasSpecular;
 uniform float uAngleDiff;
 
-
-
 void main() {
 
     vec3 n = vNormal;
