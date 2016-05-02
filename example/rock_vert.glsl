@@ -16,18 +16,29 @@ uniform float uAngleDiff;
 
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
 
-float uSeed = 42.0;
+// directions.
+vec3 dirs[6];
 
-float rand(float seed){
-    return fract(sin(dot(vec2(seed, seed) ,vec2(12.9898,78.233))) * 43758.5453);
+float uSeed = 1196.0;
+float seed;
+
+// return value in range [-1, +1]
+float rand(){
+    seed=  fract(sin(dot(vec2(seed, seed) ,vec2(12.9898,78.233))) * 43758.5453);
+    return seed;
 }
 
-float randRange(float seed, float low, float high) {
-    return low + rand(seed) * (high - low);
+float randRange(float low, float high) {
+    return low + (rand()*0.5 + 0.5  )  * (high - low);
 }
 
-vec3 randVariance(vec3 base, vec3 variance, float seed) {
-    return base + variance * vec3(rand(seed*32.32), rand(seed*2.35622), rand(seed*32441.3432)  );
+int randRangeInt(float low, float high) {
+    return int(floor( randRange( low, high ) ));
+}
+
+
+vec3 randVariance(vec3 base, vec3 variance) {
+    return base + variance * vec3(rand(), rand(), rand()  );
 }
 
 vec3 calcPos(vec2 angles) {
@@ -74,13 +85,17 @@ vec3 cut(vec3 n, vec3 r0, vec3 p) {
    return t * n * step(  0.0, dot(n, p-r0 ) ) ;
 }
 
-vec3 cutRandom(float seed, vec3 p) {
+vec3 cutRandom( vec3 p) {
 
-  vec3 n = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0), seed*0.32));
+ // vec3 n = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0)));
 
+ //rangeRangeInt(0.0,5.0) ;
+ //vec3 dir = dirs[ i ];
+
+ vec3 n = normalize(randVariance(vec3(-1.0, 0.0, 0.0), vec3(0.4, 0.4, 0.4)));
 
  //vec3 r0 = randVariance(n, vec3(0.3*n.x, 0.3*n.y, 0.3*n.z), seed*54772.3432);
- vec3 r0 = randRange(seed*54772.3432, 0.80, 0.95) * n;
+ vec3 r0 = randRange( 0.85, 0.90) * n;
 
  //vec3 r0 = vec3(0.8, 0.0, 0.0);
 
@@ -89,6 +104,18 @@ vec3 cutRandom(float seed, vec3 p) {
 }
 
 void main() {
+
+
+  dirs[0] = vec3(1.0, 0.0, 0.0);
+  dirs[1] = vec3(-1.0, 0.0, 0.0);
+
+  dirs[2] = vec3(0, 1.0, 0.0);
+  dirs[3] = vec3(0, -1.0, 0.0);
+
+  dirs[4] = vec3(0.0, 0.0, 1.0);
+  dirs[5] = vec3(0.0, 0.0, -1.0);
+
+  seed = uSeed;
 
   vec3 col = aNormal;
 
@@ -104,11 +131,12 @@ void main() {
 
   // p += cut( normalize(vec3(0.7, 0.0, 0.0)), vec3(0.8, 0.0, 0.0), p );
 
-   p += cutRandom(uSeed, p);
-   p += cutRandom(uSeed*0.3, p);
-   p += cutRandom(uSeed*2332.3, p);
-   p += cutRandom(uSeed*220.309, p);
-
+   p += cutRandom( p);
+   /*
+   p += cutRandom( p);
+   p += cutRandom(p);
+   p += cutRandom(p);
+*/
 
    //p += cut( vec3(1.0, 0.0, 0.0), vec3(0.8, 0.0, 0.0), p );
 
