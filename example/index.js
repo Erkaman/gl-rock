@@ -93,7 +93,7 @@ shell.on("gl-init", function () {
 
 
     gui = new createGui(gl);
-    gui.windowSizes = [360, 580];
+    gui.windowSizes = [160, 180];
 
     bunnyGeo = Geometry(gl)
         .attr('aPosition', bunny.positions)
