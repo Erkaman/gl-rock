@@ -37,7 +37,10 @@ var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
 
+var seed = 100;
+
 var tesselation = 10;
+
 /*
 function createSphere() {
     var positions = [];
@@ -120,6 +123,10 @@ function demo1Randomize() {
     demo1SpecularPower.val = Math.round(randomArray(0, 40).oned(1)[0]);
 }
 
+function newSeed() {
+    seed = Math.round(randomArray(0, 1000).oned(1)[0]);
+}
+
 shell.on("gl-render", function (t) {
     var gl = shell.gl
     var canvas = shell.canvas;
@@ -148,6 +155,7 @@ shell.on("gl-render", function (t) {
     demo1Shader.uniforms.uSpecularPower = demo1SpecularPower.val;
     demo1Shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
     demo1Shader.uniforms.uAngleDiff = (Math.PI * 2) / tesselation;
+    demo1Shader.uniforms.uSeed = seed;
 
 
     /*
@@ -168,33 +176,15 @@ shell.on("gl-render", function (t) {
     };
     mouseLeftDownPrev = pressed;
 
-    /*
+
     gui.begin(io, "Window");
 
-
-    gui.textLine("Lighting Settings");
-
-    gui.draggerRgb("Ambient Light", demo1AmbientLight);
-    gui.draggerRgb("Diffuse Color", demo1DiffuseColor);
-    gui.draggerRgb("Light Color", demo1LightColor);
-
-    gui.checkbox("Has Specular Lighting", demo1HasSpecular);
-    if (demo1HasSpecular.val)
-        gui.sliderFloat("Specular Power", demo1SpecularPower, 0, 40);
-
-    gui.draggerFloat3("Light Direction", demo1SunDir, [-2, +2], ["X:", "Y:", "Z:"]);
-
-    if (gui.button("Randomize")) {
-        demo1Randomize();
+    if (gui.button("New Seed")) {
+        newSeed();
     }
 
-    gui.separator();
-
-    gui.textLine("Miscellaneous");
-    gui.draggerRgb("Background", bg);
-
     gui.end(gl, canvas.width, canvas.height);
-    */
+
 });
 
 shell.on("tick", function () {

@@ -9,12 +9,12 @@ varying vec3 vPosition;
 uniform mat4 uProjection;
 uniform mat4 uView;
 uniform float uAngleDiff;
+uniform float uSeed;
 
 #define PI 3.1415
 
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
 
-float uSeed = 19116.0;
 float seed;
 
 // return value in range [-1, +1]
@@ -102,7 +102,6 @@ void main() {
     p += cutRandom(p);
     p += cutRandom(p);
     p += cutRandom(p);
-
 
     p.x = p.x * 1.4;
 
