@@ -1,0 +1,3 @@
+# glsl-godrays
+
+Trying to make procedurally generated rocks in WebGL...

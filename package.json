@@ -1,0 +1,55 @@
+{
+  "name": "glsl-godrays",
+  "version": "1.0.1",
+  "description": "Shader function for rendering godrays(volumetric light scattering).",
+  "scripts": {
+    "start": "budo --verbose example/index.js -t glslify --live --open",
+    "test": "standard"
+  },
+  "keywords": [
+    "stackgl",
+    "godrays",
+    "sun",
+    "glsl",
+    "gl",
+    "webgl",
+    "light",
+    "volumetric",
+    "scattering"
+  ],
+  "author": "Eric Arnebäck <arnebackeric@gmail.com> (https://github.com/Erkaman)",
+  "license": "MIT",
+  "devDependencies": {
+    "bunny": "^1.0.1",
+    "geo-3d-transform-mat4": "^1.0.0",
+    "gl-camera-pos-from-view-matrix": "^1.0.1",
+    "gl-geometry": "^3.1.0",
+    "gl-mat4": "^1.1.4",
+    "gl-now": "^1.4.0",
+    "gl-shader": "^4.2.0",
+    "gl-vec3": "^1.0.3",
+    "glslify": "^5.0.2",
+    "normals": "^1.0.1",
+    "orbit-camera": "^1.0.0",
+    "pnp-gui": "0.0.3",
+    "primitive-icosphere": "^1.0.2",
+    "random-array": "0.0.2",
+    "vertices-bounding-box": "^1.0.0"
+  },
+  "dependencies": {
+    "glsl-noise": "0.0.0"
+  },
+  "directories": {
+    "example": "example"
+  },
+  "browserify": {
+    "transform": [
+      "glslify"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Erkaman/glsl-godrays.git"
+  },
+  "homepage": "https://github.com/Erkaman/glsl-godrays#readme"
+}
