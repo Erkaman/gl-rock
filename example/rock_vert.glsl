@@ -19,12 +19,12 @@ uniform float uAngleDiff;
 // directions.
 vec3 dirs[6];
 
-float uSeed = 1196.0;
+float uSeed = 191116.0;
 float seed;
 
 // return value in range [-1, +1]
 float rand(){
-    seed=  fract(sin(dot(vec2(seed, seed) ,vec2(12.9898,78.233))) * 43758.5453);
+    seed=  (fract(sin(dot(vec2(seed, seed) ,vec2(12.9898,78.233))) * 43758.5453) )  * 2.0 - 1.0;
     return seed;
 }
 
@@ -87,15 +87,15 @@ vec3 cut(vec3 n, vec3 r0, vec3 p) {
 
 vec3 cutRandom( vec3 p) {
 
- // vec3 n = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0)));
+  vec3 n = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0)));
 
- //rangeRangeInt(0.0,5.0) ;
+ //int i = randRangeInt(0.0,5.0) ;
  //vec3 dir = dirs[ i ];
 
- vec3 n = normalize(randVariance(vec3(-1.0, 0.0, 0.0), vec3(0.4, 0.4, 0.4)));
+// vec3 n = normalize(randVariance(vec3(-1.0, 0.0, 0.0), vec3(0.4, 0.4, 0.4)));
 
  //vec3 r0 = randVariance(n, vec3(0.3*n.x, 0.3*n.y, 0.3*n.z), seed*54772.3432);
- vec3 r0 = randRange( 0.85, 0.90) * n;
+ vec3 r0 = randRange( 0.65, 0.80) * n;
 
  //vec3 r0 = vec3(0.8, 0.0, 0.0);
 
@@ -131,12 +131,30 @@ void main() {
 
   // p += cut( normalize(vec3(0.7, 0.0, 0.0)), vec3(0.8, 0.0, 0.0), p );
 
+
    p += cutRandom( p);
-   /*
+
+
    p += cutRandom( p);
    p += cutRandom(p);
    p += cutRandom(p);
-*/
+ p += cutRandom(p);
+ p += cutRandom(p);
+ p += cutRandom(p);
+ p += cutRandom(p);
+ p += cutRandom(p);
+ p += cutRandom(p);
+
+
+/*
+   vec3 a = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0)));
+  a = normalize(randVariance(vec3(0.0, 0.0, 0.0), vec3(1.0, 1.0, 1.0)));
+w
+   if(a.x < 0.0 || a.y < 0.0 || a.z < 0.0  ) {
+      col = vec3(1.0, 0.0, 0.0);
+   }
+   */
+
 
    //p += cut( vec3(1.0, 0.0, 0.0), vec3(0.8, 0.0, 0.0), p );
 
