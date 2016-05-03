@@ -93,7 +93,6 @@ void main() {
 
 
     p += cutRandom( p);
-
     p += cutRandom( p);
     p += cutRandom(p);
     p += cutRandom(p);
@@ -114,7 +113,6 @@ void main() {
 //  p +=  vec3(0.1, 0.1, 0.1) * snoise3(s*2.0) * distortN;
 
 //  p +=  0.1 * snoise3(s*4.0) * distortN;
-
 
     vNormal = col;
     vPosition = p;
