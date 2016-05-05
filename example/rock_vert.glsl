@@ -91,7 +91,7 @@ void main() {
     vec3 s = p; // seed
     vec3 n = aNormal;
 
-
+/*
     p += cutRandom( p);
     p += cutRandom( p);
     p += cutRandom(p);
@@ -103,10 +103,10 @@ void main() {
     p += cutRandom(p);
     p += cutRandom(p);
 
-
+*/
     p.x = p.x * 1.4;
 
-  p +=  0.1 * snoise3(s) * n;
+  //p +=  0.1 * snoise3(s) * n;
 
 // float a = mix(0.1, 0.8, s.x);
 

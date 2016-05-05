@@ -14,6 +14,10 @@ uniform float uSpecularPower;
 uniform float uHasSpecular;
 uniform float uAngleDiff;
 
+uniform sampler2D uPalette;
+
+
+
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
 
 float noise(vec3 s) {
@@ -52,7 +56,9 @@ void main() {
 // vec3(0.71, 0.66, 0.59)
 
 
-    vec3 perlin =  mix( vec3(0.63, 0.52, 0.4), vec3(0.71, 0.66, 0.59) , fbm(10.0*s) );
+    vec3 perlin =   texture2D(uPalette, vec2( fbm(10.0*s), 0.0) ).xyz;
+
+    //vec3 perlin =  mix( vec3(0.63, 0.52, 0.4), vec3(0.71, 0.66, 0.59) , fbm(10.0*s) );
 
 
   //  perlin = vec3(0.73, 0.52, 0.4) * pow( fbm( 10.0*s), 5.0);

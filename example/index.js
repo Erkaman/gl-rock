@@ -15,6 +15,8 @@ var boundingBox = require('vertices-bounding-box');
 var transform = require('geo-3d-transform-mat4');
 var randomArray = require('random-array');
 var createSphere = require('primitive-icosphere');
+var createGradientPalette = require('glsl-gradient-palette').createGradientPalette;
+var PaletteDrawer = require('glsl-gradient-palette').PaletteDrawer;
 
 var demo1Shader, bunnyGeo, sphereGeo;
 
@@ -40,6 +42,9 @@ var demo1HasSpecular = {val: true};
 var seed = 100;
 
 var tesselation = 10;
+
+var simplePaletteTexture;
+var paletteDrawer;
 
 /*
 function createSphere() {
@@ -91,6 +96,21 @@ shell.on("gl-init", function () {
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
 
+    var simple =  [
+        [0.0, [1.0,0.0,0.0]],
+        [0.5, [0.0,0.0,0.0]],
+        [1.0, [0.0,0.0,1.0]],
+    ];
+
+    simplePaletteTexture = createGradientPalette(gl,simple);
+    paletteDrawer = new PaletteDrawer(gl, [400, 40], [880, 100] );
+
+  //  console.log("wat", paletteDrawer);
+
+   // console.log("wat", createPaletteDrawer);
+
+
+
 
     gui = new createGui(gl);
     gui.windowSizes = [160, 180];
@@ -112,6 +132,8 @@ shell.on("gl-init", function () {
         .faces(sphere.cells);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
+
+    camera.rotate([0,0], [0,0] );
 
 });
 
@@ -156,6 +178,8 @@ shell.on("gl-render", function (t) {
     demo1Shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
     demo1Shader.uniforms.uAngleDiff = (Math.PI * 2) / tesselation;
     demo1Shader.uniforms.uSeed = seed;
+    demo1Shader.uniforms.uPalette = simplePaletteTexture.bind();
+
 
 
     /*
@@ -164,6 +188,9 @@ shell.on("gl-render", function (t) {
     */
     sphereGeo.bind(demo1Shader);
     sphereGeo.draw();
+
+
+    paletteDrawer.draw(simplePaletteTexture, canvas.width, canvas.height);
 
 
     var pressed = shell.wasDown("mouse-left");
