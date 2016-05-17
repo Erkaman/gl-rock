@@ -97,11 +97,28 @@ shell.on("gl-init", function () {
     gl.cullFace(gl.BACK)
 
     var simple =  [
-        [0.0, [1.0,0.0,0.0]],
-        [0.5, [0.0,0.0,0.0]],
-        [1.0, [0.0,0.0,1.0]],
-    ];
+        [0.0, [0.43, 0.32, 0.2]],
 
+
+
+        [0.25, [0.50, 0.40, 0.30]],
+
+
+        [0.5, [0.60, 0.45, 0.37]],
+
+
+        [1.0, [0.71, 0.66, 0.59]],
+
+
+    ];
+/*
+
+ // # A2 85 66
+ // vec3(0.63, 0.52, 0.4)
+
+ // # B5 AA 98
+ // vec3(0.71, 0.66, 0.59)
+ */
     simplePaletteTexture = createGradientPalette(gl,simple);
     paletteDrawer = new PaletteDrawer(gl, [400, 40], [880, 100] );
 

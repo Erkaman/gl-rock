@@ -20,43 +20,117 @@ uniform sampler2D uPalette;
 
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
 
+#pragma glslify: worley3D = require(glsl-worley/worley3D.glsl)
+#pragma glslify: worley2x2x2 = require(glsl-worley/worley2x2x2.glsl)
+#pragma glslify: worley2D = require(glsl-worley/worley2D.glsl)
+#pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
+
+
+
 float noise(vec3 s) {
     return snoise3(s) * 0.5 + 0.5;
 }
 
 
-float fbm( vec3 p)
-{
-	float f = 0.0;
-    f += 0.5000*noise( p ); p = p*2.02;
-    f += 0.2500*noise( p ); p = p*2.03;
-    f += 0.1250*noise( p ); p = p*2.01;
-    f += 0.0625*noise( p );
-    return f/0.9375;
+/*
+
+  function PerlinNoise_1D(float x)
+      total = 0
+      p = persistence
+      n = Number_Of_Octaves - 1
+      loop i from 0 to n
+
+          frequency = 2i
+          amplitude = pi
+
+          total = total + InterpolatedNoisei(x * frequency) * amplitude
+      end of i loop
+      return total
+  end function
+
+*/
+
+float fbm( vec3 p, int n, float persistence) {
+
+    float v = 0.0;
+    float total = 0.0;
+    float amplitude = 1.0;
+
+    for(int i = 0 ; i < 10; ++i) {
+        if(i >= n) { break; }
+
+        v += amplitude * noise(p);
+        total += amplitude;
+
+        amplitude  *= persistence;
+        p *= 2.0; // double freq.
+
+    }
+
+    return v / total;
 }
+
 
 void main() {
 
     vec3 n = vNormal;
     n = normalize(cross(dFdx(vPosition) ,dFdy(vPosition) ) );
-
+    vec3 temp;
 
     vec3 s = vPosition;
 
-    float a = fbm(10.0*s );
-    float b = fbm(14.0*s + 434343.0 );
-
 // http://imgur.com/hg4lLcd
-
 // # A2 85 66
 // vec3(0.63, 0.52, 0.4)
-
 
 // # B5 AA 98
 // vec3(0.71, 0.66, 0.59)
 
+    float t= fbm(vec3(10.0)*s, 8, 0.8);
+    vec3 stoneColor =   texture2D(uPalette, vec2(t , 0.0) ).xyz;
 
-    vec3 perlin =   texture2D(uPalette, vec2( fbm(10.0*s), 0.0) ).xyz;
+
+
+
+
+    vec3 p = vec3(10.0)*s;
+    t= fbm(p + 2.0*fbm(s * 3.0, 8, 0.6)  , 8, 0.2);
+
+    // crack pattern.
+    if(t > 0.5 && t < 0.55) {
+         temp = vec3(1.0, 1.0, 1.0);
+    } else {
+         temp = vec3(0.0, 0.0, 0.0);
+    }
+
+    t= fbm(10.0*(s + vec3(10.0) ), 1, 0.1);
+
+    // crack pattern.
+    if(t > 0.01 && t < 0.60) {
+         temp = vec3(0.0, 0.0, 0.0);
+    }
+    vec3 cracksMask = temp;
+
+
+
+    t= fbm(vec3(10.0)*s, 8, 1.0);
+    vec3 cracksColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0), t);
+
+  // vec3 perlin = mix(stoneColor, cracksColor, cracksMask);
+
+vec3 perlin = vec3(1.0, 0.0, 0.0);
+
+
+
+  vec2 F = worley3D(vPosition*10.0, 1.0, false);
+  float F1 = F.x;
+  float F2 = F.y;
+
+
+  //perlin = vec3(F2-F1);
+
+  //  perlin = vec3(t);
+
 
     //vec3 perlin =  mix( vec3(0.63, 0.52, 0.4), vec3(0.71, 0.66, 0.59) , fbm(10.0*s) );
 
@@ -76,8 +150,9 @@ void main() {
    // gl_FragColor = vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);
 
 
-    gl_FragColor = vec4(perlin, 1.0);
+ //   gl_FragColor = vec4(perlin, 1.0);
 
+gl_FragColor = vec4(vec3(F2-F1), 1.0);
 
 }
 /*
@@ -102,3 +177,21 @@ http://imgur.com/hg4lLcd
 http://www.iquilezles.org/www/articles/palettes/palettes.htm
 http://www.saltgames.com/article/trigPalette/
 */
+
+/*
+
+/*
+  g = perlin(x,y,z) * 20
+    grain = g - int(g)
+    */
+
+
+    /*
+    marble
+    */
+   // float f = 30.0; perlin= vec3( abs(sin(f*( t )) ) );
+
+
+// marble:
+//= sin(f*(x+a*turb(x,y,z)))
+
