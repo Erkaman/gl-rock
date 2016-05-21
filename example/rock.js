@@ -6,6 +6,8 @@ var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var seedRandom = require('seed-random');
 var createSphere = require('./sphere.js');
+var tooloud = require ('tooloud');
+
 
 function Rock(gl, obj) {
 
@@ -68,7 +70,23 @@ function Rock(gl, obj) {
         normals = createNormals.vertexNormals(cells, positions);
     }
 
-    sphereGeo = Geometry(gl)
+    for (var i = 0; i < positions.length; ++i) {
+        var p = positions[i];
+
+        var noiseScale = 2.0;
+
+        var noise = 0.2*tooloud.Perlin.noise( noiseScale*p[0], noiseScale*p[1], noiseScale*p[2] );
+
+
+        positions[i][0] += noise;
+        positions[i][1] += noise;
+        positions[i][2] += noise;
+    }
+
+    normals = createNormals.vertexNormals(cells, positions);
+
+
+        sphereGeo = Geometry(gl)
         .attr('aPosition', positions)
         .attr('aNormal',
             normals

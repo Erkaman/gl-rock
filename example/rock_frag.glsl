@@ -90,8 +90,9 @@ vec4 lighting(vec3 diff) {
 void main() {
 
 
-    vec3 diff;
+    vec3 diff = vec3(1.0, 0.0, 0.0);
 
+/*
     vec3 s = vPosition;
 
     float t= fbm(vec3(10.0)*s, 8, 0.8);
@@ -103,9 +104,13 @@ void main() {
 
     diff += 0.3*t1;
     diff -= 0.3*t2;
+    */
 
     gl_FragColor =  lighting(diff);
 
     //gl_FragColor = vec4(diff, 1.0);
 
+//gl_FragColor = vec4(vec3(  dot(normalize(uLightDir), vNormal)  ), 1.0);
+
+gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }
