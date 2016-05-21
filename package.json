@@ -38,6 +38,7 @@
     "pnp-gui": "0.0.3",
     "primitive-icosphere": "^1.0.2",
     "random-array": "0.0.2",
+    "random-item": "^1.0.0",
     "vertices-bounding-box": "^1.0.0"
   },
   "dependencies": {

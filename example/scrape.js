@@ -23,7 +23,6 @@ function getNeighbours(positions, cells) {
 
         var cellPositions = cells[iCell];
 
-        //   console.log("face ", cellPositions);
 
         function wrap(i) {
             if(i < 0) {
@@ -67,11 +66,6 @@ function getNeighbours(positions, cells) {
 
     return {adjacentVertices: adjacentVertices, adjacentFaces: adjacentFaces};
 
-    /*
-     console.log("neightbours: ", adjacentVertices);
-     console.log("positions: ", positions);
-     console.log("cells: ", cells);
-     */
 
     // return {positions: newPositions, cells: newCells};
 
@@ -95,7 +89,7 @@ function project(n, r0, p) {
 
 
 // scrape at position index.
-function scrape(positionIndex, positions, cells, normals, adjacentVertices, adjacentFaces, strength) {
+function scrape(positionIndex, positions, cells, normals, adjacentVertices, adjacentFaces, strength, radius) {
 
     // modify positions to scrape.
 
@@ -110,7 +104,7 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
     var centerPosition = positions[positionIndex];
 
-    console.log("center: ", centerPosition);
+//    console.log("center: ", centerPosition);
 
     // to scrape, we simply project all vertices that are close to `centerPosition`
     // onto a plane. The equation of this plane is given by dot(n, r-r0) = 0,
@@ -122,7 +116,7 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
     vec3.copy(r0, centerPosition);
     vec3.scaleAndAdd(r0, r0, n, -strength);
 
-
+/*
     console.log("projected r0: ", r0);
     console.log("projected n: ", n);
 
@@ -130,6 +124,7 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
     console.log("out " , project(n, r0, vec3.fromValues(1,-1,1)));
 
     console.log("out " , project(n, r0, vec3.fromValues(1.32,-1,0.1)));
+*/
 
     var stack = [];
     stack.push(positionIndex);
@@ -160,7 +155,7 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
 
         ++count;
-        if(vec3.squaredDistance(projectedP, r0) < 0.2) {
+        if(vec3.squaredDistance(projectedP, r0) < radius) {
 
             positions[topIndex] = projectedP;
             normals[topIndex] = n;
@@ -261,8 +256,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
     }
 */
 
-    console.log("count ", count);
-    console.log("total count ", positions.length);
     //console.log("border vertices ", borderVertices);
 
 

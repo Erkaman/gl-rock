@@ -26,29 +26,9 @@ uniform sampler2D uPalette;
 #pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
 
 
-
 float noise(vec3 s) {
     return snoise3(s) * 0.5 + 0.5;
 }
-
-
-/*
-
-  function PerlinNoise_1D(float x)
-      total = 0
-      p = persistence
-      n = Number_Of_Octaves - 1
-      loop i from 0 to n
-
-          frequency = 2i
-          amplitude = pi
-
-          total = total + InterpolatedNoisei(x * frequency) * amplitude
-      end of i loop
-      return total
-  end function
-
-*/
 
 float fbm( vec3 p, int n, float persistence) {
 
@@ -70,76 +50,40 @@ float fbm( vec3 p, int n, float persistence) {
     return v / total;
 }
 
+float ridge2( vec3 p, int n, float persistence) {
 
-void main() {
-/*
-    vec3 n = vNormal;
-    n = normalize(cross(dFdx(vPosition) ,dFdy(vPosition) ) );
-    vec3 temp;
+    float v = 0.0;
+    float total = 0.0;
+    float amplitude = 1.0;
 
-    vec3 s = vPosition;
+    for(int i = 0 ; i < 10; ++i) {
+        if(i >= n) { break; }
 
-// http://imgur.com/hg4lLcd
-// # A2 85 66
-// vec3(0.63, 0.52, 0.4)
-
-// # B5 AA 98
-// vec3(0.71, 0.66, 0.59)
-
-    float t= fbm(vec3(10.0)*s, 8, 0.8);
-    vec3 stoneColor =   texture2D(uPalette, vec2(t , 0.0) ).xyz;
+        float signal = (1.0 - abs(  snoise3(p) )  );
+      /*  signal *= signal;
+        signal *= signal;
+*/
+        signal = pow(signal, 8.0);
 
 
+        v += amplitude * signal;
+        total += amplitude;
 
+        amplitude  *= persistence;
+        p *= 2.0; // double freq.
 
-
-    vec3 p = vec3(10.0)*s;
-    t= fbm(p + 2.0*fbm(s * 3.0, 8, 0.6)  , 8, 0.2);
-
-    // crack pattern.
-    if(t > 0.5 && t < 0.55) {
-         temp = vec3(1.0, 1.0, 1.0);
-    } else {
-         temp = vec3(0.0, 0.0, 0.0);
     }
 
-    t= fbm(10.0*(s + vec3(10.0) ), 1, 0.1);
-
-    // crack pattern.
-    if(t > 0.01 && t < 0.60) {
-         temp = vec3(0.0, 0.0, 0.0);
-    }
-    vec3 cracksMask = temp;
+    return v / total;
+}
 
 
 
-    t= fbm(vec3(10.0)*s, 8, 1.0);
-    vec3 cracksColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0), t);
-
-  // vec3 perlin = mix(stoneColor, cracksColor, cracksMask);
-
-vec3 perlin = vec3(1.0, 0.0, 0.0);
+vec4 lighting(vec3 diff) {
 
 
+     vec3 n = vNormal;
 
-  vec2 F = worley3D(vPosition*10.0, 1.0, false);
-  float F1 = F.x;
-  float F2 = F.y;
-
-
-  //perlin = vec3(F2-F1);
-
-  //  perlin = vec3(t);
-
-
-    //vec3 perlin =  mix( vec3(0.63, 0.52, 0.4), vec3(0.71, 0.66, 0.59) , fbm(10.0*s) );
-
-
-  //  perlin = vec3(0.73, 0.52, 0.4) * pow( fbm( 10.0*s), 5.0);
-    // look up blending operators.
-
-    vec3 diff = uDiffuseColor;
-    diff  = perlin;
 
     vec3 l = normalize(uLightDir);
     vec3 v = normalize(uEyePos - vPosition);
@@ -147,18 +91,38 @@ vec3 perlin = vec3(1.0, 0.0, 0.0);
     vec3 diffuse = diff * uLightColor * dot(n, l) ;
     vec3 specular = pow(clamp(dot(normalize(l+v),n),0.0,1.0)  , uSpecularPower) * vec3(1.0,1.0,1.0);
 
+    return vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);
+}
 
- //   gl_FragColor = vec4(perlin, 1.0);
+void main() {
 
-gl_FragColor = vec4(vec3(F2-F1), 1.0);
-*/
+//vec3 diff = vec3(0.8, 0.6, 0.4);
 
 
-   // gl_FragColor = vec4(ambient + diffuse + specular*uHasSpecular, 1.0);
+vec3 diff;
 
- vec3 l = normalize(vec3(1.0,1.0,1.0));
- //gl_FragColor = vec4(vec3(dot(vNormal,l)  ), 1.0);
- gl_FragColor = vec4(vNormal, 1.0);
+vec3 s = vPosition;
+
+//tex =  vec3(fbm( p,  8, 0.2));
+
+
+
+     float t= fbm(vec3(10.0)*s, 8, 0.8);
+     diff =   texture2D(uPalette, vec2(t , 0.0) ).xyz;
+
+
+
+     float t1 = ridge2(vec3(1.0)*s, 8, 0.8);
+     float t2 = ridge2(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);
+
+//     diff =  vec3(t);
+   diff += 0.3*t1;
+   diff -= 0.3*t2;
+
+
+gl_FragColor =  lighting(diff);
+
+ // gl_FragColor = vec4(diff, 1.0);
 
 }
 /*
@@ -201,3 +165,70 @@ http://www.saltgames.com/article/trigPalette/
 // marble:
 //= sin(f*(x+a*turb(x,y,z)))
 
+
+
+/*
+     vec3 n = vNormal;
+     n = normalize(cross(dFdx(vPosition) ,dFdy(vPosition) ) );
+     vec3 temp;
+
+     vec3 s = vPosition;
+
+ // http://imgur.com/hg4lLcd
+ // # A2 85 66
+ // vec3(0.63, 0.52, 0.4)
+
+ // # B5 AA 98
+ // vec3(0.71, 0.66, 0.59)
+
+     float t= fbm(vec3(10.0)*s, 8, 0.8);
+     vec3 stoneColor =   texture2D(uPalette, vec2(t , 0.0) ).xyz;
+
+
+
+
+
+     vec3 p = vec3(10.0)*s;
+     t= fbm(p + 2.0*fbm(s * 3.0, 8, 0.6)  , 8, 0.2);
+
+     // crack pattern.
+     if(t > 0.5 && t < 0.55) {
+          temp = vec3(1.0, 1.0, 1.0);
+     } else {
+          temp = vec3(0.0, 0.0, 0.0);
+     }
+
+     t= fbm(10.0*(s + vec3(10.0) ), 1, 0.1);
+
+     // crack pattern.
+     if(t > 0.01 && t < 0.60) {
+          temp = vec3(0.0, 0.0, 0.0);
+     }
+     vec3 cracksMask = temp;
+
+
+
+     t= fbm(vec3(10.0)*s, 8, 1.0);
+     vec3 cracksColor = mix(vec3(1.0, 0.0, 0.0), vec3(0.0), t);
+
+   // vec3 perlin = mix(stoneColor, cracksColor, cracksMask);
+
+ vec3 perlin = vec3(1.0, 0.0, 0.0);
+
+
+
+   vec2 F = worley3D(vPosition*10.0, 1.0, false);
+   float F1 = F.x;
+   float F2 = F.y;
+
+
+   //perlin = vec3(F2-F1);
+
+   //  perlin = vec3(t);
+
+
+     //vec3 perlin =  mix( vec3(0.63, 0.52, 0.4), vec3(0.71, 0.66, 0.59) , fbm(10.0*s) );
+ */
+
+   //  perlin = vec3(0.73, 0.52, 0.4) * pow( fbm( 10.0*s), 5.0);
+     // look up blending operators.

@@ -17,6 +17,8 @@ var randomArray = require('random-array');
 var createSphere = require('primitive-icosphere');
 var createGradientPalette = require('glsl-gradient-palette').createGradientPalette;
 var PaletteDrawer = require('glsl-gradient-palette').PaletteDrawer;
+var randomItem = require('random-item');
+
 var scrape = require('./scrape.js');
 
 
@@ -34,9 +36,9 @@ const RENDER_BUNNY = 0;
 
 var bg = [0.6, 0.7, 1.0]; // clear color.
 
-var demo1DiffuseColor = [0.42, 0.34, 0.0];
-var demo1AmbientLight = [0.77, 0.72, 0.59];
-var demo1LightColor = [0.40, 0.47, 0.0];
+var demo1DiffuseColor = [0.40, 0.40, 0.40];
+var demo1AmbientLight = [0.60, 0.60, 0.60];
+var demo1LightColor = [0.40, 0.40, 0.4];
 var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
@@ -193,7 +195,7 @@ shell.on("gl-init", function () {
  // vec3(0.71, 0.66, 0.59)
  */
     simplePaletteTexture = createGradientPalette(gl,simple);
-    paletteDrawer = new PaletteDrawer(gl, [400, 40], [880, 100] );
+    paletteDrawer = new PaletteDrawer(gl, [000, 40], [480, 100] );
 
   //  console.log("wat", paletteDrawer);
 
@@ -221,8 +223,78 @@ shell.on("gl-init", function () {
     var adjacentFaces = obj.adjacentFaces;
 
 
-    scrape.scrape(100, positions, cells, normals, adjacentVertices, adjacentFaces, 0.1);
-   // normals = createNormals.vertexNormals(cells, positions);
+
+    // generate positions at which to scrape.
+
+    var scrapeIndices = [];
+
+    for(var i = 0; i < 7; ++i) {
+
+        while (true) {
+
+            var randIndex = Math.floor(positions.length * Math.random());
+            var p = positions[randIndex];
+
+            var tooClose = false;
+            // check that it is not too close to the other vertices.
+            for (var j = 0; j < scrapeIndices.length; ++j) {
+
+                var q = positions[scrapeIndices[j]];
+/*
+                console.log("dist", vec3.distance(p, q) );
+
+                console.log("p", p );
+                console.log("q", q );
+*/
+                if (vec3.distance(p, q) < 0.8) {
+                    console.log("reject ", q );
+                    tooClose = true;
+                    break;
+                }
+            }
+
+
+            if (tooClose)
+                continue
+            else {
+                console.log("add scrape", randIndex);
+                scrapeIndices.push(randIndex);
+                break;
+            }
+        }
+
+    }
+
+
+    //dist 2.4045084971874737
+
+    //distance between { 0.18163563200134011, 0.80901699437494752, -0.5590169943749475 } and { 0.293892626146236571: 0.309016994374947452: 0.9045084971874736 }
+
+    console.log("positions ", positions.length);
+
+
+
+    for(var i = 0; i < scrapeIndices.length; ++i) {
+
+        console.log("scrape, " ,i, scrapeIndices[i], positions[scrapeIndices[i]]);
+
+     //   console.log("scrape, " ,i,  );
+
+
+        scrape.scrape(scrapeIndices[i],positions, cells, normals, adjacentVertices, adjacentFaces, 0.2, 0.3);
+        normals = createNormals.vertexNormals(cells, positions);
+
+    }
+
+
+
+    /*
+    scrape.scrape(0,positions, cells, normals, adjacentVertices, adjacentFaces, 0.3, 0.2);
+    normals = createNormals.vertexNormals(cells, positions);
+
+    scrape.scrape(200,positions, cells, normals, adjacentVertices, adjacentFaces, 0.3, 0.2);
+    normals = createNormals.vertexNormals(cells, positions);
+*/
 
 
 
@@ -294,7 +366,7 @@ shell.on("gl-render", function (t) {
     sphereGeo.draw();
 
 
-    paletteDrawer.draw(simplePaletteTexture, canvas.width, canvas.height);
+   paletteDrawer.draw(simplePaletteTexture, canvas.width, canvas.height);
 
 
     var pressed = shell.wasDown("mouse-left");
@@ -307,7 +379,7 @@ shell.on("gl-render", function (t) {
     };
     mouseLeftDownPrev = pressed;
 
-
+/*
     gui.begin(io, "Window");
 
     if (gui.button("New Seed")) {
@@ -315,6 +387,7 @@ shell.on("gl-render", function (t) {
     }
 
     gui.end(gl, canvas.width, canvas.height);
+    */
 
 });
 
