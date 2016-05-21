@@ -1,8 +1,3 @@
-/**
- * Created by eric on 21/05/16.
- */
-
-
 function createSphere(opt) {
 
     var radius = opt.radius || 1.0;

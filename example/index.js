@@ -53,7 +53,6 @@ shell.on("gl-init", function () {
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 
     camera.rotate([0,0], [0,0] );
-
 });
 
 

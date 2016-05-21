@@ -1,9 +1,6 @@
 var Set = require('es6-set');
 var vec3 = require('gl-vec3');
 
-/*
- Implement Catmull-Clark subvision, as it is described on Wikipedia
- */
 function getNeighbours(positions, cells) {
 
     /*
@@ -56,8 +53,6 @@ function getNeighbours(positions, cells) {
     }
 
     // now we convert adjacentVertices from an array of sets, to an array of arrays.
-
-
     for(var i = 0; i < positions.length; ++i) {
 
         adjacentVertices[i] =  Array.from(adjacentVertices[i]);
@@ -65,10 +60,6 @@ function getNeighbours(positions, cells) {
     }
 
     return {adjacentVertices: adjacentVertices, adjacentFaces: adjacentFaces};
-
-
-    // return {positions: newPositions, cells: newCells};
-
 }
 
 function project(n, r0, p) {
@@ -81,10 +72,7 @@ function project(n, r0, p) {
     vec3.copy(projectedP, p);
     vec3.scaleAndAdd(projectedP, projectedP, n, t);
 
-
     return projectedP;
-    //float t = (  dot(n, r0 - p )) / ( dot(n,n) );
-    //return t * n * step(  0.0, dot(n, p-r0 ) ) ;
 }
 
 
@@ -104,8 +92,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
     var centerPosition = positions[positionIndex];
 
-//    console.log("center: ", centerPosition);
-
     // to scrape, we simply project all vertices that are close to `centerPosition`
     // onto a plane. The equation of this plane is given by dot(n, r-r0) = 0,
     // where n is the plane normal, r0 is a point on the plane(in our case we set this to be the projected center),
@@ -115,16 +101,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
     var r0 = vec3.create();
     vec3.copy(r0, centerPosition);
     vec3.scaleAndAdd(r0, r0, n, -strength);
-
-/*
-    console.log("projected r0: ", r0);
-    console.log("projected n: ", n);
-
-    console.log("")
-    console.log("out " , project(n, r0, vec3.fromValues(1,-1,1)));
-
-    console.log("out " , project(n, r0, vec3.fromValues(1.32,-1,0.1)));
-*/
 
     var stack = [];
     stack.push(positionIndex);
@@ -137,13 +113,9 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
         var topIndex = stack.pop();
 
-        //    console.log("traverse ", topIndex);
-
         if(traversed[topIndex])
             continue; // already traversed; look at next element in stack.
         traversed[topIndex] = true;
-
-//        console.log("HAI");
 
         var topPosition = positions[topIndex];
         // project onto plane.

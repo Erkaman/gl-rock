@@ -15,8 +15,6 @@ function Rock(gl, obj) {
         [0.5, [0.60, 0.45, 0.37]],
         [1.0, [0.71, 0.66, 0.59]],
     ];
-    
-    
 
     this.seed = obj.seed;
     this.Random = seedRandom(this.seed);
@@ -55,7 +53,6 @@ function Rock(gl, obj) {
                 }
             }
 
-
             if (tooClose)
                 continue
             else {
@@ -77,7 +74,6 @@ function Rock(gl, obj) {
             normals
         )
         .faces(cells);
-
 }
 
 var demo1DiffuseColor = [0.40, 0.40, 0.40];
@@ -102,15 +98,8 @@ Rock.prototype.draw = function (shader, view, projection) {
     shader.uniforms.uSeed = this.seed;
     shader.uniforms.uPalette = this.simplePaletteTexture.bind();
 
-
-    /*
-     bunnyGeo.bind(demo1Shader);
-     bunnyGeo.draw();
-     */
     sphereGeo.bind(shader);
     sphereGeo.draw();
-
-
 }
 
 module.exports = Rock;
