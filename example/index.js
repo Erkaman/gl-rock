@@ -1,6 +1,5 @@
 /* global requestAnimationFrame */
 
-var bunny = require('bunny');
 var mat4 = require('gl-mat4');
 var vec3 = require('gl-vec3');
 var glShader = require('gl-shader');
@@ -8,10 +7,7 @@ var glslify = require('glslify')
 var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
 var createGui = require("pnp-gui");
-var boundingBox = require('vertices-bounding-box');
-var transform = require('geo-3d-transform-mat4');
 var randomArray = require('random-array');
-var createSphere = require('primitive-icosphere');
 var PaletteDrawer = require('glsl-gradient-palette').PaletteDrawer;
 var randomItem = require('random-item');
 
@@ -52,7 +48,7 @@ shell.on("gl-init", function () {
     gui = new createGui(gl);
     gui.windowSizes = [160, 180];
 
-    rock = new createRock(gl);
+    rock = new createRock(gl, {seed:100});
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 
