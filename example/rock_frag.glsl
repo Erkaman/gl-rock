@@ -72,7 +72,7 @@ float fbm( vec3 p, int n, float persistence) {
 
 
 void main() {
-
+/*
     vec3 n = vNormal;
     n = normalize(cross(dFdx(vPosition) ,dFdy(vPosition) ) );
     vec3 temp;
@@ -147,12 +147,18 @@ vec3 perlin = vec3(1.0, 0.0, 0.0);
     vec3 diffuse = diff * uLightColor * dot(n, l) ;
     vec3 specular = pow(clamp(dot(normalize(l+v),n),0.0,1.0)  , uSpecularPower) * vec3(1.0,1.0,1.0);
 
-   // gl_FragColor = vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);
-
 
  //   gl_FragColor = vec4(perlin, 1.0);
 
 gl_FragColor = vec4(vec3(F2-F1), 1.0);
+*/
+
+
+   // gl_FragColor = vec4(ambient + diffuse + specular*uHasSpecular, 1.0);
+
+ vec3 l = normalize(vec3(1.0,1.0,1.0));
+ //gl_FragColor = vec4(vec3(dot(vNormal,l)  ), 1.0);
+ gl_FragColor = vec4(vNormal, 1.0);
 
 }
 /*

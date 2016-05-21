@@ -21,6 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "bunny": "^1.0.1",
+    "es6-set": "^0.1.4",
     "geo-3d-transform-mat4": "^1.0.0",
     "gl-camera-pos-from-view-matrix": "^1.0.1",
     "gl-geometry": "^3.1.0",

@@ -5,7 +5,7 @@ var mat4 = require('gl-mat4');
 var vec3 = require('gl-vec3');
 var Geometry = require('gl-geometry');
 var glShader = require('gl-shader');
-var normals = require('normals');
+var createNormals = require('normals');
 var glslify = require('glslify')
 var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
@@ -17,6 +17,8 @@ var randomArray = require('random-array');
 var createSphere = require('primitive-icosphere');
 var createGradientPalette = require('glsl-gradient-palette').createGradientPalette;
 var PaletteDrawer = require('glsl-gradient-palette').PaletteDrawer;
+var scrape = require('./scrape.js');
+
 
 var demo1Shader, bunnyGeo, sphereGeo;
 
@@ -46,49 +48,120 @@ var tesselation = 10;
 var simplePaletteTexture;
 var paletteDrawer;
 
-/*
-function createSphere() {
+function createSphere2(opt) {
+
+
+    var radius = opt.radius || 1.0;
+    var stacks = opt.stacks || 32;
+    var slices = opt.slices || 32;
+
     var positions = [];
     var cells = [];
     var normals = [];
-    var angles = [];
+    var uvs = [];
 
-    var N = tesselation;
+    // keeps track of the index of the next vertex that we create.
+    var index = 0;
 
-    var stacks= N;
-    var slices= N;
 
-    // loop through stacks.
-    for (var i = 0; i <= stacks; ++i){
+    /*
+     First of all, we create all the faces that are NOT adjacent to the
+     bottom(0,-R,0) and top(0,+R,0) vertices of the sphere.
 
-        var phi = (i* Math.PI) / stacks;
+     (it's easier this way, because for the bottom and top vertices, we need to add triangle faces.
+     But for the faces between, we need to add quad faces. )
+     */
+
+    // loop through the stacks.
+    for (var i = 1; i < stacks; ++i){
+
+        var u  = i / stacks;
+        var phi = u * Math.PI;
+
+
+        var stackBaseIndex = cells.length/2;
 
         // loop through the slices.
-        for (var j = 0; j <= slices; ++j){
+        for (var j = 0; j < slices; ++j){
 
-            var theta = (j*Math.PI * 2) / slices;
+            var v = j / slices;
+            var theta = v * (Math.PI * 2);
 
-            // use  spherical coordinates to calculate the positions.
+
+
+            var R = radius
+            // use spherical coordinates to calculate the positions.
             var x = Math.cos (theta) * Math.sin (phi);
             var y = Math.cos (phi);
-            var z = Math.sin (theta) * Math.sin (phi);
+            var z =Math.sin (theta) * Math.sin (phi);
 
-            positions.push([x,y,z]);
+            positions.push([R*x,R*y,R*z]);
             normals.push([x,y,z]);
-            angles.push([phi, theta]);
+            uvs.push([u,v]);
 
+            if((i +1) != stacks ) { // for the last stack, we don't need to add faces.
+
+                var i1, i2, i3, i4;
+
+                if((j+1)==slices) {
+                    // for the last vertex in the slice, we need to wrap around to create the face.
+                    i1 = index;
+                    i2 = stackBaseIndex;
+                    i3 = index  + slices;
+                    i4 = stackBaseIndex  + slices;
+
+                } else {
+                    // use the indices from the current slice, and indices from the next slice, to create the face.
+                    i1 = index;
+                    i2 = index + 1;
+                    i3 = index  + slices;
+                    i4 = index  + slices + 1;
+
+                }
+
+                // add quad face
+                cells.push([i1, i2, i3]);
+                cells.push([i4, i3, i2]);
+            }
+
+            index++;
         }
     }
 
-    // Calc The Index Positions
-    for (var i = 0; i < slices * stacks + slices; ++i){
-        cells.push ( [  (i), (i + slices + 1), (i + slices)  ]) ;
-        cells.push( [ i + slices + 1 ,  i, i + 1 ] );
+    /*
+     Next, we finish the sphere by adding the faces that are adjacent to the top and bottom vertices.
+     */
+
+    var topIndex = index++;
+    positions.push([0.0,radius,0.0]);
+    normals.push([0,1,0]);
+    uvs.push([0,0]);
+
+
+    var bottomIndex = index++;
+    positions.push([0, -radius, 0 ]);
+    normals.push([0,-1,0]);
+    uvs.push([1,0]);
+
+
+    for (var i = 0; i < slices; ++i) {
+
+        var i1 = topIndex;
+        var i2 = (i+0);
+        var i3 = (i+1) % slices;
+        cells.push([i3, i2, i1]);
+
+        var i1 = bottomIndex;
+        var i2 = (bottomIndex-1) - slices +  (i+0);
+        var i3 = (bottomIndex-1) - slices + ((i+1)%slices);
+        cells.push([i1, i2, i3]);
     }
 
-    return {positions: positions, cells: cells, normals:normals, angles:angles};
+    return {positions: positions, cells: cells, normals:normals, uvs:uvs};
 }
-*/
+
+
+
 shell.on("gl-init", function () {
     var gl = shell.gl
 
@@ -132,21 +205,35 @@ shell.on("gl-init", function () {
     gui = new createGui(gl);
     gui.windowSizes = [160, 180];
 
-    bunnyGeo = Geometry(gl)
-        .attr('aPosition', bunny.positions)
-        .attr('aNormal', normals.vertexNormals(bunny.cells, bunny.positions))
-        .faces(bunny.cells);
 
-    var sphere = createSphere(1, { subdivisions: 2})
+    var sphere =
+        createSphere2({stacks:20, slices:20})
+
+        //createSphere(1, { subdivisions: 2})
+
+
+    var positions = sphere.positions;
+    var cells = sphere.cells;
+    var normals = sphere.normals;
+
+    var obj = scrape.getNeighbours(positions, cells);
+    var adjacentVertices = obj.adjacentVertices;
+    var adjacentFaces = obj.adjacentFaces;
+
+
+    scrape.scrape(100, positions, cells, normals, adjacentVertices, adjacentFaces, 0.1);
+   // normals = createNormals.vertexNormals(cells, positions);
+
+
 
     sphereGeo = Geometry(gl)
-        .attr('aPosition', sphere.positions)
+        .attr('aPosition', positions)
         .attr('aNormal',
             //normals.vertexNormals(sphere.cells, sphere.positions)
-            sphere.normals
+            normals
         )
      //   .attr("aAngles", sphere.angles, {size: 2} )
-        .faces(sphere.cells);
+        .faces(cells);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 

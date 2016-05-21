@@ -104,7 +104,7 @@ void main() {
     p += cutRandom(p);
 
 */
-    p.x = p.x * 1.4;
+  //  p.x = p.x * 1.4;
 
   //p +=  0.1 * snoise3(s) * n;
 
