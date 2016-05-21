@@ -33,12 +33,23 @@ var paletteDrawer;
 var seed = 100;
 var noiseScale = {val: 2.0};
 var noiseStrength = {val: 0.2};
+var scrapeCount = {val: 7};
+var scrapeMinDist = {val:0.8};
+var scrapeStrength = {val:0.2};
+var scrapeRadius = {val:0.3};
+
+
+
 
 function newRock(gl) {
     rock = new createRock(gl, {
         seed:seed,
         noiseScale : noiseScale.val,
-        noiseStrength : noiseStrength.val
+        noiseStrength : noiseStrength.val,
+        scrapeCount: scrapeCount.val,
+        scrapeMinDist: scrapeMinDist.val,
+        scrapeStrength: scrapeStrength.val,
+        scrapeRadius: scrapeRadius.val
 });
 
 }
@@ -105,16 +116,17 @@ shell.on("gl-render", function (t) {
     gui.textLine("Mesh");
 
 
-  //  var noiseScale = {val: 2.0};
-   // var noiseStrength = {val: 0.2};
-
-
     gui.sliderFloat("Noise Scale", noiseScale, 0.5, 5.0);
     gui.sliderFloat("Noise Strength", noiseStrength, 0.0, 1.0);
 
+    gui.sliderInt("Scrape Count", scrapeCount, 0, 15);
+    gui.sliderFloat("scrapeMinDist", scrapeMinDist, 0.1, 1.0);
+
+    gui.sliderFloat("scrapeStrength", scrapeStrength, 0.1, 1.0);
+    gui.sliderFloat("scrapeRadius", scrapeRadius, 0.1, 1.0);
 
     gui.separator();
-    
+
     gui.textLine("Texture");
 
     gui.separator();

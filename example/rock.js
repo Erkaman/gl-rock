@@ -8,7 +8,6 @@ var seedRandom = require('seed-random');
 var createSphere = require('./sphere.js');
 var tooloud = require ('tooloud');
 
-
 function Rock(gl, obj) {
 
     var simple = [
@@ -19,8 +18,12 @@ function Rock(gl, obj) {
     ];
 
     this.seed = obj.seed;
-    this.noiseScale = obj.noiseScale; // 2.0; 
-    this.noiseStrength= obj.noiseStrength; //0.2;
+    this.noiseScale = obj.noiseScale;
+    this.noiseStrength= obj.noiseStrength;
+    this.scrapeCount= obj.scrapeCount;
+    this.scrapeMinDist= obj.scrapeMinDist;
+    this.scrapeStrength= obj.scrapeStrength;
+    this.scrapeRadius= obj.scrapeRadius;
 
 
     this.Random = seedRandom(this.seed);
@@ -40,7 +43,9 @@ function Rock(gl, obj) {
     // generate positions at which to scrape.
     var scrapeIndices = [];
 
-    for (var i = 0; i < 7; ++i) {
+    for (var i = 0; i < this.scrapeCount; ++i) {
+
+        var attempts = 0;
 
         while (true) {
 
@@ -53,13 +58,15 @@ function Rock(gl, obj) {
 
                 var q = positions[scrapeIndices[j]];
 
-                if (vec3.distance(p, q) < 0.8) {
+                if (vec3.distance(p, q) <this.scrapeMinDist) {
                     tooClose = true;
                     break;
                 }
             }
+            ++attempts;
 
-            if (tooClose)
+            // if we have done too many attempts, we let it pass regardless.
+            if (tooClose && attempts < 100)
                 continue
             else {
                 scrapeIndices.push(randIndex);
@@ -67,10 +74,13 @@ function Rock(gl, obj) {
             }
         }
 
+
     }
 
     for (var i = 0; i < scrapeIndices.length; ++i) {
-        scrape.scrape(scrapeIndices[i], positions, cells, normals, adjacentVertices, adjacentFaces, 0.2, 0.3);
+        scrape.scrape(
+            scrapeIndices[i], positions, cells, normals,
+            adjacentVertices, adjacentFaces, this.scrapeStrength, this.scrapeRadius);
         normals = createNormals.vertexNormals(cells, positions);
     }
 
