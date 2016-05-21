@@ -19,6 +19,10 @@ function Rock(gl, obj) {
     ];
 
     this.seed = obj.seed;
+    this.noiseScale = obj.noiseScale; // 2.0; 
+    this.noiseStrength= obj.noiseStrength; //0.2;
+
+
     this.Random = seedRandom(this.seed);
 
     this.simplePaletteTexture = createGradientPalette(gl, simple);
@@ -73,9 +77,12 @@ function Rock(gl, obj) {
     for (var i = 0; i < positions.length; ++i) {
         var p = positions[i];
 
-        var noiseScale = 2.0;
 
-        var noise = 0.2*tooloud.Perlin.noise( noiseScale*p[0], noiseScale*p[1], noiseScale*p[2] );
+        var noise =
+            this.noiseStrength*tooloud.Perlin.noise(
+                this.noiseScale*p[0],
+                this.noiseScale*p[1],
+                this.noiseScale*p[2] );
 
 
         positions[i][0] += noise;

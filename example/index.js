@@ -19,20 +19,29 @@ var camera = createOrbitCamera([0, -2.0, 0], [0, 0, 0], [0, 1, 0]);
 
 var mouseLeftDownPrev = false;
 
-const RENDER_BUNNY = 0;
 var rock;
+
+var bg = [0.6, 0.7, 1.0]; // clear color.
+
+var simplePaletteTexture;
+var paletteDrawer;
 
 /*
  Variables that can be modified through the GUI.
  */
 
-var bg = [0.6, 0.7, 1.0]; // clear color.
+var seed = 100;
+var noiseScale = {val: 2.0};
+var noiseStrength = {val: 0.2};
 
+function newRock(gl) {
+    rock = new createRock(gl, {
+        seed:seed,
+        noiseScale : noiseScale.val,
+        noiseStrength : noiseStrength.val
+});
 
-var tesselation = 10;
-
-var simplePaletteTexture;
-var paletteDrawer;
+}
 
 
 shell.on("gl-init", function () {
@@ -44,17 +53,15 @@ shell.on("gl-init", function () {
 
     paletteDrawer = new PaletteDrawer(gl, [000, 40], [480, 100] );
 
-
     gui = new createGui(gl);
-    gui.windowSizes = [160, 180];
+    gui.windowSizes = [260, 380];
 
-    rock = new createRock(gl, {seed:100});
+    newRock(gl);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 
     camera.rotate([0,0], [0,0] );
 });
-
 
 function newSeed() {
     seed = Math.round(randomArray(0, 1000).oned(1)[0]);
@@ -93,22 +100,62 @@ shell.on("gl-render", function (t) {
     };
     mouseLeftDownPrev = pressed;
 
-    gui.begin(io, "Window");
+    gui.begin(io, "Editor");
+
+    gui.textLine("Mesh");
+
+
+  //  var noiseScale = {val: 2.0};
+   // var noiseStrength = {val: 0.2};
+
+
+    gui.sliderFloat("Noise Scale", noiseScale, 0.5, 5.0);
+    gui.sliderFloat("Noise Strength", noiseStrength, 0.0, 1.0);
+
+
+    gui.separator();
+    
+    gui.textLine("Texture");
+
+    gui.separator();
+
 
     if (gui.button("New Seed")) {
         newSeed();
+        newRock(gl);
+    }
+    gui.textLine("Seed: " + seed);
+
+    if (gui.button("New Rock")) {
+        newRock(gl);
     }
 
     gui.end(gl, canvas.width, canvas.height);
-
-
 });
 
+var pDownPrev = false;
+
 shell.on("tick", function () {
+    var gl = shell.gl
+
+
+    var pressed = shell.wasDown("P");
+
+    if(pressed && !pDownPrev) {
+
+        newRock(gl);
+        console.log("PP")
+    }
+    pDownPrev = pressed;
+
 
     // if interacting with the GUI, do not let the mouse control the camera.
     if (gui.hasMouseFocus())
         return;
+
+
+
+
 
     if (shell.wasDown("mouse-left")) {
         var speed = 1.3;
