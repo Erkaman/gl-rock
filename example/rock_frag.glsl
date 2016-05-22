@@ -23,6 +23,10 @@ uniform float uColorNoiseStrength;
 uniform float uCracksNoiseStrength;
 
 
+uniform vec3 uBColor;
+uniform vec3 uCColor;
+uniform vec3 uDColor;
+
 
 
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
@@ -94,21 +98,30 @@ vec4 lighting(vec3 diff) {
     return vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);
 }
 
+vec3 samplePalette(float t) {
+    if(t < 0.25) {
+        return vec3(0.0);
+    } else if(t > 0.25 && t <0.5) {
+        return mix(uBColor, uCColor,  (t-0.25) /0.25 );
+    }else{
+        return mix(uCColor, uDColor,  (t-0.5) /0.5 );
+
+    }
+
+}
+
 void main() {
 
-
-/*
     float uColorNoiseScale = 10.0;
     int uColorNoiseOctaves = 8;
     float uColorNoisePersistence= 0.8;
-
 
     vec3 diff = vec3(1.0, 0.0, 0.0);
 
     vec3 s = vPosition;
 
     float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);
-    diff = uColorNoiseStrength * texture2D(uPalette, vec2(t , 0.0) ).xyz;
+    diff = uColorNoiseStrength *  samplePalette(t);
 
     float t1 = ridge(vec3(1.0)*s, 8, 0.8);
     float t2 = ridge(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);
@@ -118,7 +131,7 @@ void main() {
     diff -= uCracksNoiseStrength*t2;
 
     gl_FragColor =  lighting(diff);
-*/
-   //if(!uShowTexture)
+
+   if(!uShowTexture)
         gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }

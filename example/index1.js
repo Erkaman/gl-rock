@@ -8,7 +8,6 @@ var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
 var createGui = require("pnp-gui");
 var randomArray = require('random-array');
-var PaletteDrawer = require('glsl-gradient-palette').PaletteDrawer;
 var randomItem = require('random-item');
 var RockObj = require('./rock_obj.js');
 
@@ -23,9 +22,6 @@ var mouseLeftDownPrev = false;
 var rock;
 
 var bg = [0.6, 0.7, 1.0]; // clear color.
-
-var simplePaletteTexture;
-var paletteDrawer;
 
 var editMode = {val: 0};
 var showTexture = {val: true};
@@ -42,13 +38,11 @@ shell.on("gl-init", function () {
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
-
-    paletteDrawer = new PaletteDrawer(gl, [030, 580], [380, 640] );
-
+    
     gui = new createGui(gl);
     gui.windowSizes = [300, 530];
 
-    for(var i = 0; i < 10000; ++i)
+//    for(var i = 0; i < 10000; ++i)
         newRock(gl);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
@@ -76,7 +70,6 @@ shell.on("gl-render", function (t) {
 
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
 
-    paletteDrawer.draw(rock.getPaletteTexture(),canvas.width, canvas.height);
 
     demo1Shader.bind();
 

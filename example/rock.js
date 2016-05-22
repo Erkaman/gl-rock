@@ -1,5 +1,4 @@
 var cameraPosFromViewMatrix = require('gl-camera-pos-from-view-matrix');
-var createGradientPalette = require('glsl-gradient-palette').createGradientPalette;
 var scrape = require('./scrape.js');
 var vec3 = require('gl-vec3');
 var createNormals = require('normals');
@@ -33,7 +32,7 @@ function Rock(gl, obj) {
 
 
     var simple = [
-        [0.0, this.aColor],
+        [0.0, [0,0,0] ],
         [0.25,this.bColor],
         [0.5, this.cColor],
         [1.0, this.dColor],
@@ -42,8 +41,6 @@ function Rock(gl, obj) {
 
 
     this.Random = seedRandom(this.seed);
-
-    this.simplePaletteTexture = createGradientPalette(gl, simple);
 
     var sphere = createSphere({stacks: 20, slices: 20})
 
@@ -160,7 +157,10 @@ Rock.prototype.draw = function (shader, view, projection, showTexture, translati
     shader.uniforms.uSpecularPower = demo1SpecularPower.val;
     shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
     shader.uniforms.uSeed = this.seed;
-    shader.uniforms.uPalette = this.simplePaletteTexture.bind();
+
+    shader.uniforms.uBColor = this.bColor;
+    shader.uniforms.uCColor = this.cColor;
+    shader.uniforms.uDColor = this.dColor;
 
     shader.uniforms.uColorNoiseStrength = this.colorNoiseStrength;
     shader.uniforms.uCracksNoiseStrength = this.cracksNoiseStrength;
@@ -173,11 +173,6 @@ Rock.prototype.draw = function (shader, view, projection, showTexture, translati
 
     sphereGeo.bind(shader);
     sphereGeo.draw();
-}
-
-
-Rock.prototype.getPaletteTexture = function () {
-    return this.simplePaletteTexture;
 }
 
 module.exports = Rock;

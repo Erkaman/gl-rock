@@ -20,7 +20,6 @@
     "gl-now": "^1.4.0",
     "gl-shader": "^4.2.0",
     "gl-vec3": "^1.0.3",
-    "glsl-gradient-palette": "^1.0.0",
     "glsl-worley": "^1.0.0",
     "glslify": "^5.0.2",
     "install": "^0.7.3",
