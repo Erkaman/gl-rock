@@ -164,6 +164,7 @@ function varyMesh() {
 
 
 
+    //
     // vary scale.
 
     var scale = rockObj.scale;
@@ -171,18 +172,18 @@ function varyMesh() {
     var VARY = 0.3;
 
     scale[0] += randomArray(-VARY, +VARY).oned(1)[0];
-    if(scale[0] > 1.0) scale[0] = 1.0;
-    if(scale[0] < 0.0) scale[0] = 0.0;
+    if(scale[0] >  MESH_NOISE_SCALE_MAX) scale[0] = MESH_NOISE_SCALE_MAX;
+    if(scale[0] < MESH_NOISE_SCALE_MIN) scale[0] = MESH_NOISE_SCALE_MIN;
 
 
     scale[1] += randomArray(-VARY, +VARY).oned(1)[0];
-    if(scale[1] > 1.0) scale[1] = 1.0;
-    if(scale[1] < 0.0) scale[1] = 0.0;
+    if(scale[1] >  MESH_NOISE_SCALE_MAX) scale[1] = MESH_NOISE_SCALE_MAX;
+    if(scale[1] < MESH_NOISE_SCALE_MIN) scale[1] = MESH_NOISE_SCALE_MIN;
 
 
     scale[2] += randomArray(-VARY, +VARY).oned(1)[0];
-    if(scale[2] > 1.0) scale[2] = 1.0;
-    if(scale[2] < 0.0) scale[2] = 0.0;
+    if(scale[2] >  MESH_NOISE_SCALE_MAX) scale[2] = MESH_NOISE_SCALE_MAX;
+    if(scale[2] < MESH_NOISE_SCALE_MIN) scale[2] = MESH_NOISE_SCALE_MIN;
 
     /*
 
