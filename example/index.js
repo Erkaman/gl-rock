@@ -52,28 +52,38 @@ rockObj = {
 
 const MESH_NOISE_SCALE_MIN = 0.5;
 const MESH_NOISE_SCALE_MAX = 5.0;
+const MESH_NOISE_SCALE_VARY = 0.1;
 
 const NOISE_STRENGTH_MIN = 0.0;
 const NOISE_STRENGTH_MAX = 1.0;
+const NOISE_STRENGTH_VARY= 0.1;
+
 
 const MESH_NOISE_STRENGTH_MIN = 0.0;
 const MESH_NOISE_STRENGTH_MAX = 0.5;
+const MESH_NOISE_STRENGTH_VARY = 0.1;
 
 
 const SCRAPE_COUNT_MIN = 0;
 const SCRAPE_COUNT_MAX = 15;
+const SCRAPE_COUNT_VARY = 2;
 
 const SCRAPE_MIN_DIST_MIN = 0.1;
 const SCRAPE_MIN_DIST_MAX = 1.0;
+const SCRAPE_MIN_DIST_VARY = 0.1;
 
 const SCRAPE_STRENGTH_MIN = 0.1;
 const SCRAPE_STRENGTH_MAX = 0.6;
+const SCRAPE_STRENGTH_VARY = 0.1;
 
 const SCRAPE_RADIUS_MIN = 0.1;
 const SCRAPE_RADIUS_MAX = 0.5;
+const SCRAPE_RADIUS_VARY = 0.1;
 
 const SCALE_MIN = +1.0;
 const SCALE_MAX = +2.0;
+
+const COLOR_VARY = 0.1;
 
 function newRock(gl) {
 
@@ -138,17 +148,19 @@ function randomizeMesh() {
 
 function varyMesh() {
 
-    varyParameter(rockObj.meshNoiseScale, 0.1, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
+    varyParameter(rockObj.meshNoiseScale,
+        MESH_NOISE_SCALE_VARY, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
 
-    varyParameter(rockObj.meshNoiseStrength, 0.1, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
+    varyParameter(rockObj.meshNoiseStrength,
+        MESH_NOISE_STRENGTH_VARY, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
 
 
-    varyParameter(rockObj.scrapeCount, 2, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
+    varyParameter(rockObj.scrapeCount, SCRAPE_COUNT_VARY, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
 
-    varyParameter(rockObj.scrapeMinDist, 0.1, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
-    varyParameter(rockObj.scrapeStrength, 0.1, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
+    varyParameter(rockObj.scrapeMinDist, SCRAPE_MIN_DIST_VARY, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
+    varyParameter(rockObj.scrapeStrength, SCRAPE_STRENGTH_VARY, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
 
-    varyParameter(rockObj.scrapeRadius, 0.1, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
+    varyParameter(rockObj.scrapeRadius, SCRAPE_RADIUS_VARY, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
 
 
@@ -185,8 +197,10 @@ function varyMesh() {
 
 function varyNoise() {
 
-    varyParameter(rockObj.colorNoiseStrength, 0.1, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
-    varyParameter(rockObj.cracksNoiseStrength, 0.1, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
+    varyParameter(rockObj.colorNoiseStrength,
+        NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
+    varyParameter(rockObj.cracksNoiseStrength,
+        NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
 }
 
 
@@ -200,7 +214,7 @@ function randomizeColor() {
 
 function varyColorHelper(color) {
 
-    var VARY = 0.1;
+    var VARY =  COLOR_VARY;
 
     color[0] += randomArray(-VARY, +VARY).oned(1)[0];
     if(color[0] > 1.0) color[0] = 1.0;
