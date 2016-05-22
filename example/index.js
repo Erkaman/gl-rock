@@ -46,10 +46,10 @@ shell.on("gl-init", function () {
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
 
-    paletteDrawer = new PaletteDrawer(gl, [030, 540], [380, 600] );
+    paletteDrawer = new PaletteDrawer(gl, [030, 580], [380, 640] );
 
     gui = new createGui(gl);
-    gui.windowSizes = [300, 480];
+    gui.windowSizes = [300, 530];
 
     newRock(gl);
 
