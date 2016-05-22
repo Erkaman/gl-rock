@@ -49,6 +49,7 @@ var dColor = [0.71, 0.66, 0.59];
 
 var colorNoiseStrength = {val: 1.0};
 var cracksNoiseStrength = {val: 0.3};
+var scale = [1.0, 1.0, 1.0];
 
 
 
@@ -67,7 +68,8 @@ function newRock(gl) {
         dColor: dColor,
 
         colorNoiseStrength : colorNoiseStrength.val,
-        cracksNoiseStrength: cracksNoiseStrength.val
+        cracksNoiseStrength: cracksNoiseStrength.val,
+        scale: scale
 
 
 });
@@ -85,7 +87,7 @@ shell.on("gl-init", function () {
     paletteDrawer = new PaletteDrawer(gl, [030, 540], [380, 600] );
 
     gui = new createGui(gl);
-    gui.windowSizes = [260, 380];
+    gui.windowSizes = [300, 380];
 
     newRock(gl);
 
@@ -152,6 +154,9 @@ shell.on("gl-render", function (t) {
 
         gui.sliderFloat("scrapeStrength", scrapeStrength, 0.1, 1.0);
         gui.sliderFloat("scrapeRadius", scrapeRadius, 0.1, 1.0);
+
+        gui.draggerFloat3("Scale", scale, [0, +2], ["X:", "Y:", "Z:"]);
+
 
     } else {
         gui.textLine("Texture");

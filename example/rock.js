@@ -7,6 +7,8 @@ var Geometry = require('gl-geometry');
 var seedRandom = require('seed-random');
 var createSphere = require('./sphere.js');
 var tooloud = require ('tooloud');
+var geoTransform = require('geo-3d-transform-mat4')
+var mat4 = require('gl-mat4');
 
 function Rock(gl, obj) {
 
@@ -21,6 +23,8 @@ function Rock(gl, obj) {
     this.bColor= obj.bColor;
     this.cColor= obj.cColor;
     this.dColor= obj.dColor;
+
+    this.scale= obj.scale;
 
     this.colorNoiseStrength = obj.colorNoiseStrength;
     this.cracksNoiseStrength = obj.cracksNoiseStrength;
@@ -109,10 +113,14 @@ function Rock(gl, obj) {
         positions[i][2] += noise;
     }
 
+
+    var model = mat4.create();
+    mat4.scale(model, model, this.scale);
+    positions = geoTransform(positions, model);
+
     normals = createNormals.vertexNormals(cells, positions);
 
-
-        sphereGeo = Geometry(gl)
+    sphereGeo = Geometry(gl)
         .attr('aPosition', positions)
         .attr('aNormal',
             normals
