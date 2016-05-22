@@ -10,13 +10,6 @@ var tooloud = require ('tooloud');
 
 function Rock(gl, obj) {
 
-    var simple = [
-        [0.0, [0.43, 0.32, 0.2]],
-        [0.25, [0.50, 0.40, 0.30]],
-        [0.5, [0.60, 0.45, 0.37]],
-        [1.0, [0.71, 0.66, 0.59]],
-    ];
-
     this.seed = obj.seed;
     this.noiseScale = obj.noiseScale;
     this.noiseStrength= obj.noiseStrength;
@@ -24,6 +17,22 @@ function Rock(gl, obj) {
     this.scrapeMinDist= obj.scrapeMinDist;
     this.scrapeStrength= obj.scrapeStrength;
     this.scrapeRadius= obj.scrapeRadius;
+    this.aColor= obj.aColor;
+    this.bColor= obj.bColor;
+    this.cColor= obj.cColor;
+    this.dColor= obj.dColor;
+
+    this.colorNoiseStrength = obj.colorNoiseStrength;
+    this.cracksNoiseStrength = obj.cracksNoiseStrength;
+
+
+    var simple = [
+        [0.0, this.aColor],
+        [0.25,this.bColor],
+        [0.5, this.cColor],
+        [1.0, this.dColor],
+    ];
+
 
 
     this.Random = seedRandom(this.seed);
@@ -118,7 +127,7 @@ var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
 
-Rock.prototype.draw = function (shader, view, projection) {
+Rock.prototype.draw = function (shader, view, projection, showTexture) {
     var scratchVec = vec3.create();
 
     shader.uniforms.uView = view;
@@ -133,8 +142,22 @@ Rock.prototype.draw = function (shader, view, projection) {
     shader.uniforms.uSeed = this.seed;
     shader.uniforms.uPalette = this.simplePaletteTexture.bind();
 
+    shader.uniforms.uColorNoiseStrength = this.colorNoiseStrength;
+    shader.uniforms.uCracksNoiseStrength = this.cracksNoiseStrength;
+
+
+
+
+    shader.uniforms.uShowTexture = showTexture;
+
+
     sphereGeo.bind(shader);
     sphereGeo.draw();
+}
+
+
+Rock.prototype.getPaletteTexture = function () {
+    return this.simplePaletteTexture;
 }
 
 module.exports = Rock;

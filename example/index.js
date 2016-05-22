@@ -38,6 +38,17 @@ var scrapeMinDist = {val:0.8};
 var scrapeStrength = {val:0.2};
 var scrapeRadius = {val:0.3};
 
+var editMode = {val: 0};
+var showTexture = {val: true};
+
+
+var aColor = [0.43, 0.32, 0.2];
+var bColor = [0.50, 0.40, 0.30];
+var cColor = [0.60, 0.45, 0.37];
+var dColor = [0.71, 0.66, 0.59];
+
+var colorNoiseStrength = {val: 1.0};
+var cracksNoiseStrength = {val: 0.3};
 
 
 
@@ -49,7 +60,16 @@ function newRock(gl) {
         scrapeCount: scrapeCount.val,
         scrapeMinDist: scrapeMinDist.val,
         scrapeStrength: scrapeStrength.val,
-        scrapeRadius: scrapeRadius.val
+        scrapeRadius: scrapeRadius.val,
+        aColor: aColor,
+        bColor: bColor,
+        cColor: cColor,
+        dColor: dColor,
+
+        colorNoiseStrength : colorNoiseStrength.val,
+        cracksNoiseStrength: cracksNoiseStrength.val
+
+
 });
 
 }
@@ -62,7 +82,7 @@ shell.on("gl-init", function () {
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
 
-    paletteDrawer = new PaletteDrawer(gl, [000, 40], [480, 100] );
+    paletteDrawer = new PaletteDrawer(gl, [030, 540], [380, 600] );
 
     gui = new createGui(gl);
     gui.windowSizes = [260, 380];
@@ -75,7 +95,7 @@ shell.on("gl-init", function () {
 });
 
 function newSeed() {
-    seed = Math.round(randomArray(0, 1000).oned(1)[0]);
+    seed = Math.round(randomArray(0, 1000000).oned(1)[0]);
 }
 
 shell.on("gl-render", function (t) {
@@ -94,13 +114,13 @@ shell.on("gl-render", function (t) {
 
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
 
+    paletteDrawer.draw(rock.getPaletteTexture(),canvas.width, canvas.height);
+
     demo1Shader.bind();
 
-  // paletteDrawer.draw(simplePaletteTexture, canvas.width, canvas.height);
 
-    rock.draw(demo1Shader, view, projection);
-
-
+    rock.draw(demo1Shader, view, projection, showTexture.val);
+    
     var pressed = shell.wasDown("mouse-left");
     var io = {
         mouseLeftDownCur: pressed,
@@ -113,21 +133,49 @@ shell.on("gl-render", function (t) {
 
     gui.begin(io, "Editor");
 
-    gui.textLine("Mesh");
+    gui.textLine("Edit Mode")
 
-
-    gui.sliderFloat("Noise Scale", noiseScale, 0.5, 5.0);
-    gui.sliderFloat("Noise Strength", noiseStrength, 0.0, 1.0);
-
-    gui.sliderInt("Scrape Count", scrapeCount, 0, 15);
-    gui.sliderFloat("scrapeMinDist", scrapeMinDist, 0.1, 1.0);
-
-    gui.sliderFloat("scrapeStrength", scrapeStrength, 0.1, 1.0);
-    gui.sliderFloat("scrapeRadius", scrapeRadius, 0.1, 1.0);
+    gui.radioButton("Mesh", editMode, 0);
+    gui.sameLine();
+    gui.radioButton("Texture", editMode, 1);
 
     gui.separator();
 
-    gui.textLine("Texture");
+    if(editMode.val == 0) {
+        gui.textLine("Mesh");
+
+        gui.sliderFloat("Noise Scale", noiseScale, 0.5, 5.0);
+        gui.sliderFloat("Noise Strength", noiseStrength, 0.0, 1.0);
+
+        gui.sliderInt("Scrape Count", scrapeCount, 0, 15);
+        gui.sliderFloat("scrapeMinDist", scrapeMinDist, 0.1, 1.0);
+
+        gui.sliderFloat("scrapeStrength", scrapeStrength, 0.1, 1.0);
+        gui.sliderFloat("scrapeRadius", scrapeRadius, 0.1, 1.0);
+
+    } else {
+        gui.textLine("Texture");
+
+        gui.checkbox("Show Texture",showTexture );
+
+        gui.separator();
+
+        gui.textLine("Noise Palette");
+
+
+        gui.draggerRgb("aColor", aColor);
+        gui.draggerRgb("bColor", bColor);
+        gui.draggerRgb("cColor", cColor);
+        gui.draggerRgb("dColor", dColor);
+
+        gui.separator();
+
+        gui.textLine("Noise");
+
+        gui.sliderFloat("Color Strength", colorNoiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Cracks Strength", cracksNoiseStrength, 0.0, 1.0);
+    }
+
 
     gui.separator();
 
@@ -164,10 +212,7 @@ shell.on("tick", function () {
     // if interacting with the GUI, do not let the mouse control the camera.
     if (gui.hasMouseFocus())
         return;
-
-
-
-
+    
 
     if (shell.wasDown("mouse-left")) {
         var speed = 1.3;

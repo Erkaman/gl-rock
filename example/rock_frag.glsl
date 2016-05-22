@@ -13,8 +13,15 @@ uniform mat4 uView;
 uniform float uSpecularPower;
 uniform float uHasSpecular;
 uniform float uAngleDiff;
+uniform bool uShowTexture;
+uniform float uSeed;
 
 uniform sampler2D uPalette;
+
+
+uniform float uColorNoiseStrength;
+uniform float uCracksNoiseStrength;
+
 
 
 
@@ -90,27 +97,29 @@ vec4 lighting(vec3 diff) {
 void main() {
 
 
+
+    float uColorNoiseScale = 10.0;
+    int uColorNoiseOctaves = 8;
+    float uColorNoisePersistence= 0.8;
+
+
     vec3 diff = vec3(1.0, 0.0, 0.0);
 
-/*
     vec3 s = vPosition;
 
-    float t= fbm(vec3(10.0)*s, 8, 0.8);
-    diff =   texture2D(uPalette, vec2(t , 0.0) ).xyz;
+    float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);
+    diff = uColorNoiseStrength * texture2D(uPalette, vec2(t , 0.0) ).xyz;
 
 
     float t1 = ridge(vec3(1.0)*s, 8, 0.8);
     float t2 = ridge(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);
 
-    diff += 0.3*t1;
-    diff -= 0.3*t2;
-    */
+    // add cracks.
+    diff += uCracksNoiseStrength*t1;
+    diff -= uCracksNoiseStrength*t2;
 
     gl_FragColor =  lighting(diff);
 
-    //gl_FragColor = vec4(diff, 1.0);
-
-//gl_FragColor = vec4(vec3(  dot(normalize(uLightDir), vNormal)  ), 1.0);
-
-gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
+    if(!uShowTexture)
+        gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }
