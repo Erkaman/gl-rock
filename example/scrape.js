@@ -13,12 +13,6 @@ function getNeighbours(positions, cells) {
      */
     var adjacentVertices = new Array(positions.length);
 
-    
-    /*
-     adjacentFaces[i] Contains all faces that are adjacent to the vertex with index i.
-     */
-    var adjacentFaces = new Array(positions.length);
-
     // go through all faces.
     for(var iCell = 0; iCell < cells.length; ++iCell) {
 
@@ -45,16 +39,11 @@ function getNeighbours(positions, cells) {
             if(typeof adjacentVertices[cur] === 'undefined') {
                 adjacentVertices[cur] = new Set();
             }
-            if(typeof adjacentFaces[cur] === 'undefined') {
-                adjacentFaces[cur] = [];
-            }
 
             // add adjacent vertices.
             adjacentVertices[cur].add(prev);
             adjacentVertices[cur].add(next);
 
-            // add adjacent faces.
-            adjacentFaces[cur].push(iCell);
 
         }
     }
@@ -64,7 +53,7 @@ function getNeighbours(positions, cells) {
         adjacentVertices[i] =  Array.from(adjacentVertices[i]);
     }
 
-    return {adjacentVertices: adjacentVertices, adjacentFaces: adjacentFaces};
+    return {adjacentVertices: adjacentVertices};
 }
 
 /*
@@ -85,7 +74,7 @@ function project(n, r0, p) {
 
 
 // scrape at vertex with index `positionIndex`.
-function scrape(positionIndex, positions, cells, normals, adjacentVertices, adjacentFaces, strength, radius) {
+function scrape(positionIndex, positions, cells, normals, adjacentVertices, strength, radius) {
 
     var traversed = new Array(positions.length);
     for(var i = 0; i < positions.length; ++i) {
@@ -145,12 +134,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
     }
 }
-
-/*
-
-
- */
-
 
 module.exports.getNeighbours = getNeighbours;
 module.exports.scrape = scrape;

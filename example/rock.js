@@ -53,7 +53,6 @@ function Rock(gl, obj) {
         // so we only need to compute the adjacent positions once.
         var obj = scrape.getNeighbours(positions, cells);
         adjacentVertices = obj.adjacentVertices;
-        adjacentFaces = obj.adjacentFaces;
     }
 
     // generate positions at which to scrape.
@@ -96,7 +95,7 @@ function Rock(gl, obj) {
     for (var i = 0; i < scrapeIndices.length; ++i) {
         scrape.scrape(
             scrapeIndices[i], positions, cells, normals,
-            adjacentVertices, adjacentFaces, this.scrapeStrength, this.scrapeRadius);
+            adjacentVertices, this.scrapeStrength, this.scrapeRadius);
 
     }
 
