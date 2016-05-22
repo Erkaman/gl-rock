@@ -123,19 +123,43 @@ shell.on("gl-render", function (t) {
 
     gui.separator();
 
+    const MESH_NOISE_SCALE_MIN = 0.5;
+    const MESH_NOISE_SCALE_MAX = 5.0;
+
+    const NOISE_STRENGTH_MIN = 0.0;
+    const NOISE_STRENGTH_MAX = 1.0;
+
+
+    const SCRAPE_COUNT_MIN = 0;
+    const SCRAPE_COUNT_MAX = 15;
+
+    const SCRAPE_MIN_DIST_MIN = 0.1;
+    const SCRAPE_MIN_DIST_MAX = 1.0;
+
+    const SCRAPE_STRENGTH_MIN = 0.1;
+    const SCRAPE_STRENGTH_MAX = 1.0;
+
+    const SCRAPE_RADIUS_MIN = 0.1;
+    const SCRAPE_RADIUS_MAX = 1.0;
+
+    const SCALE_MIN = +0.0;
+    const SCALE_MAX = +2.0;
+
     if(editMode.val == 0) {
         gui.textLine("Mesh");
 
-        gui.sliderFloat("Noise Scale", rockObj.meshNoiseScale, 0.5, 5.0);
-        gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Noise Scale",
+            rockObj.meshNoiseScale, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
+        gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
 
-        gui.sliderInt("Scrape Count", rockObj.scrapeCount, 0, 15);
-        gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, 0.1, 1.0);
+        gui.sliderInt("Scrape Count", rockObj.scrapeCount, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
+        gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
 
-        gui.sliderFloat("scrapeStrength", rockObj.scrapeStrength, 0.1, 1.0);
-        gui.sliderFloat("scrapeRadius", rockObj.scrapeRadius, 0.1, 1.0);
+        gui.sliderFloat("scrapeStrength",
+            rockObj.scrapeStrength, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
+        gui.sliderFloat("scrapeRadius", rockObj.scrapeRadius, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
-        gui.draggerFloat3("Scale", rockObj.scale, [0, +2], ["X:", "Y:", "Z:"]);
+        gui.draggerFloat3("Scale", rockObj.scale, [SCALE_MIN, SCALE_MAX], ["X:", "Y:", "Z:"]);
 
     } else {
         gui.textLine("Texture");
@@ -155,8 +179,10 @@ shell.on("gl-render", function (t) {
 
         gui.textLine("Noise");
 
-        gui.sliderFloat("Color Strength", rockObj.colorNoiseStrength, 0.0, 1.0);
-        gui.sliderFloat("Cracks Strength", rockObj.cracksNoiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Color Strength",
+            rockObj.colorNoiseStrength, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
+        gui.sliderFloat("Cracks Strength",
+            rockObj.cracksNoiseStrength, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
     }
 
     gui.separator();
