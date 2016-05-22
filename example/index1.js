@@ -33,11 +33,8 @@ var showTexture = {val: true};
 var rockObj = new RockObj();
 
 function newRock(gl) {
-
     rock = new createRock(gl, rockObj );
-
 }
-
 
 shell.on("gl-init", function () {
     var gl = shell.gl
@@ -51,7 +48,8 @@ shell.on("gl-init", function () {
     gui = new createGui(gl);
     gui.windowSizes = [300, 530];
 
-    newRock(gl);
+    for(var i = 0; i < 1000; ++i)
+        newRock(gl);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 

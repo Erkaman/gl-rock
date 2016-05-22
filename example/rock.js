@@ -7,8 +7,11 @@ var Geometry = require('gl-geometry');
 var seedRandom = require('seed-random');
 var createSphere = require('./sphere.js');
 var tooloud = require ('tooloud');
-var geoTransform = require('geo-3d-transform-mat4')
 var mat4 = require('gl-mat4');
+
+
+var adjacentVertices = null;
+var adjacentFaces = null;
 
 function Rock(gl, obj) {
 
@@ -49,9 +52,13 @@ function Rock(gl, obj) {
     var cells = sphere.cells;
     var normals = sphere.normals;
 
-    var obj = scrape.getNeighbours(positions, cells);
-    var adjacentVertices = obj.adjacentVertices;
-    var adjacentFaces = obj.adjacentFaces;
+    if(!adjacentVertices) {
+        // we are always using the same sphere as base for the rock,
+        // so we only need to compute the adjacent positions once.
+        var obj = scrape.getNeighbours(positions, cells);
+        adjacentVertices = obj.adjacentVertices;
+        adjacentFaces = obj.adjacentFaces;
+    }
 
     // generate positions at which to scrape.
     var scrapeIndices = [];
@@ -94,7 +101,7 @@ function Rock(gl, obj) {
         scrape.scrape(
             scrapeIndices[i], positions, cells, normals,
             adjacentVertices, adjacentFaces, this.scrapeStrength, this.scrapeRadius);
-        normals = createNormals.vertexNormals(cells, positions);
+
     }
 
     for (var i = 0; i < positions.length; ++i) {
@@ -111,13 +118,14 @@ function Rock(gl, obj) {
         positions[i][0] += noise;
         positions[i][1] += noise;
         positions[i][2] += noise;
+
+
+        positions[i][0] *= this.scale[0];
+        positions[i][1] *= this.scale[1];
+        positions[i][2] *= this.scale[2];
     }
 
-
-    var model = mat4.create();
-    mat4.scale(model, model, this.scale);
-    positions = geoTransform(positions, model);
-
+    // of course, we must recompute the normals.
     normals = createNormals.vertexNormals(cells, positions);
 
     sphereGeo = Geometry(gl)

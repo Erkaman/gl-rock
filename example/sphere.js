@@ -1,3 +1,6 @@
+/*
+Create an UV sphere.
+ */
 function createSphere(opt) {
 
     var radius = opt.radius || 1.0;
@@ -11,7 +14,6 @@ function createSphere(opt) {
 
     // keeps track of the index of the next vertex that we create.
     var index = 0;
-
 
     /*
      First of all, we create all the faces that are NOT adjacent to the

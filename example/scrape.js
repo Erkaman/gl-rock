@@ -3,6 +3,9 @@ var vec3 = require('gl-vec3');
 
 function getNeighbours(positions, cells) {
 
+    console.log("NEIGHT");
+
+    
     /*
      adjacentVertices[i] contains a set containing all the indices of the neighbours of the vertex with
      index i.
@@ -33,7 +36,7 @@ function getNeighbours(positions, cells) {
         // go through all the points of the face.
         for (var iPosition = 0; iPosition < cellPositions.length; ++iPosition) {
 
-            // in this face, the neighbours of this points are the previous and next points(in the array)
+            // the neighbours of this points are the previous and next points(in the array)
             var cur = cellPositions[wrap(iPosition+0)];
             var prev = cellPositions[wrap(iPosition-1)];
             var next = cellPositions[wrap(iPosition+1)];
@@ -46,8 +49,11 @@ function getNeighbours(positions, cells) {
                 adjacentFaces[cur] = [];
             }
 
+            // add adjacent vertices.
             adjacentVertices[cur].add(prev);
             adjacentVertices[cur].add(next);
+
+            // add adjacent faces.
             adjacentFaces[cur].push(iCell);
 
         }
@@ -55,14 +61,15 @@ function getNeighbours(positions, cells) {
 
     // now we convert adjacentVertices from an array of sets, to an array of arrays.
     for(var i = 0; i < positions.length; ++i) {
-
         adjacentVertices[i] =  Array.from(adjacentVertices[i]);
-
     }
 
     return {adjacentVertices: adjacentVertices, adjacentFaces: adjacentFaces};
 }
 
+/*
+Projects the point `p` onto the plane defined by the normal `n` and the point `r0`
+ */
 function project(n, r0, p) {
     // For an explanation of the math, see http://math.stackexchange.com/a/100766
 
@@ -77,12 +84,8 @@ function project(n, r0, p) {
 }
 
 
-// scrape at position index.
+// scrape at vertex with index `positionIndex`.
 function scrape(positionIndex, positions, cells, normals, adjacentVertices, adjacentFaces, strength, radius) {
-
-    // modify positions to scrape.
-
-    // start at positon, bla bla.
 
     var traversed = new Array(positions.length);
     for(var i = 0; i < positions.length; ++i) {

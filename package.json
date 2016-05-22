@@ -1,21 +1,12 @@
 {
-  "name": "glsl-godrays",
-  "version": "1.0.1",
-  "description": "Shader function for rendering godrays(volumetric light scattering).",
+  "name": "gl-rock",
+  "version": "1.0.0",
+  "description": "Procedual rock generation in OpenGL",
   "scripts": {
-    "start": "budo --verbose example/index.js -t glslify --live --open",
+    "start": "budo --verbose example/index1.js -t glslify --live --open",
     "test": "standard"
   },
   "keywords": [
-    "stackgl",
-    "godrays",
-    "sun",
-    "glsl",
-    "gl",
-    "webgl",
-    "light",
-    "volumetric",
-    "scattering"
   ],
   "author": "Eric Arnebäck <arnebackeric@gmail.com> (https://github.com/Erkaman)",
   "license": "MIT",
@@ -56,7 +47,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Erkaman/glsl-godrays.git"
+    "url": "https://github.com/Erkaman/gl-rock.git"
   },
-  "homepage": "https://github.com/Erkaman/glsl-godrays#readme"
+  "homepage": "https://github.com/Erkaman/gl-rock#readme"
 }

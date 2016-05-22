@@ -97,7 +97,7 @@ vec4 lighting(vec3 diff) {
 void main() {
 
 
-
+/*
     float uColorNoiseScale = 10.0;
     int uColorNoiseOctaves = 8;
     float uColorNoisePersistence= 0.8;
@@ -110,7 +110,6 @@ void main() {
     float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);
     diff = uColorNoiseStrength * texture2D(uPalette, vec2(t , 0.0) ).xyz;
 
-
     float t1 = ridge(vec3(1.0)*s, 8, 0.8);
     float t2 = ridge(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);
 
@@ -119,7 +118,7 @@ void main() {
     diff -= uCracksNoiseStrength*t2;
 
     gl_FragColor =  lighting(diff);
-
-   if(!uShowTexture)
+*/
+   //if(!uShowTexture)
         gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }
