@@ -26,53 +26,33 @@ var bg = [0.6, 0.7, 1.0]; // clear color.
 var simplePaletteTexture;
 var paletteDrawer;
 
-/*
- Variables that can be modified through the GUI.
- */
-
-var seed = 100;
-var noiseScale = {val: 2.0};
-var noiseStrength = {val: 0.2};
-var scrapeCount = {val: 7};
-var scrapeMinDist = {val:0.8};
-var scrapeStrength = {val:0.2};
-var scrapeRadius = {val:0.3};
-
 var editMode = {val: 0};
 var showTexture = {val: true};
 
 
-var aColor = [0.43, 0.32, 0.2];
-var bColor = [0.50, 0.40, 0.30];
-var cColor = [0.60, 0.45, 0.37];
-var dColor = [0.71, 0.66, 0.59];
+var rockObj;
 
-var colorNoiseStrength = {val: 1.0};
-var cracksNoiseStrength = {val: 0.3};
-var scale = [1.0, 1.0, 1.0];
+rockObj = {
+    seed:100,
+    noiseScale : {val: 2.0},
+    noiseStrength : {val: 0.2},
+    scrapeCount: {val: 7},
+    scrapeMinDist: {val:0.8},
+    scrapeStrength: {val:0.2},
+    scrapeRadius: {val:0.3},
+    aColor: [0.43, 0.32, 0.2],
+    bColor: [0.50, 0.40, 0.30],
+    cColor: [0.60, 0.45, 0.37],
+    dColor: [0.71, 0.66, 0.59],
 
-
+    colorNoiseStrength : {val: 1.0},
+    cracksNoiseStrength: {val: 0.3},
+    scale:  [1.0, 1.0, 1.0]
+};
 
 function newRock(gl) {
-    rock = new createRock(gl, {
-        seed:seed,
-        noiseScale : noiseScale.val,
-        noiseStrength : noiseStrength.val,
-        scrapeCount: scrapeCount.val,
-        scrapeMinDist: scrapeMinDist.val,
-        scrapeStrength: scrapeStrength.val,
-        scrapeRadius: scrapeRadius.val,
-        aColor: aColor,
-        bColor: bColor,
-        cColor: cColor,
-        dColor: dColor,
 
-        colorNoiseStrength : colorNoiseStrength.val,
-        cracksNoiseStrength: cracksNoiseStrength.val,
-        scale: scale
-
-
-});
+    rock = new createRock(gl, rockObj );
 
 }
 
@@ -97,7 +77,7 @@ shell.on("gl-init", function () {
 });
 
 function newSeed() {
-    seed = Math.round(randomArray(0, 1000000).oned(1)[0]);
+    rockObj.seed = Math.round(randomArray(0, 1000000).oned(1)[0]);
 }
 
 shell.on("gl-render", function (t) {
@@ -146,17 +126,16 @@ shell.on("gl-render", function (t) {
     if(editMode.val == 0) {
         gui.textLine("Mesh");
 
-        gui.sliderFloat("Noise Scale", noiseScale, 0.5, 5.0);
-        gui.sliderFloat("Noise Strength", noiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Noise Scale", rockObj.noiseScale, 0.5, 5.0);
+        gui.sliderFloat("Noise Strength", rockObj.noiseStrength, 0.0, 1.0);
 
-        gui.sliderInt("Scrape Count", scrapeCount, 0, 15);
-        gui.sliderFloat("scrapeMinDist", scrapeMinDist, 0.1, 1.0);
+        gui.sliderInt("Scrape Count", rockObj.scrapeCount, 0, 15);
+        gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, 0.1, 1.0);
 
-        gui.sliderFloat("scrapeStrength", scrapeStrength, 0.1, 1.0);
-        gui.sliderFloat("scrapeRadius", scrapeRadius, 0.1, 1.0);
+        gui.sliderFloat("scrapeStrength", rockObj.scrapeStrength, 0.1, 1.0);
+        gui.sliderFloat("scrapeRadius", rockObj.scrapeRadius, 0.1, 1.0);
 
-        gui.draggerFloat3("Scale", scale, [0, +2], ["X:", "Y:", "Z:"]);
-
+        gui.draggerFloat3("Scale", rockObj.scale, [0, +2], ["X:", "Y:", "Z:"]);
 
     } else {
         gui.textLine("Texture");
@@ -168,19 +147,18 @@ shell.on("gl-render", function (t) {
         gui.textLine("Noise Palette");
 
 
-        gui.draggerRgb("aColor", aColor);
-        gui.draggerRgb("bColor", bColor);
-        gui.draggerRgb("cColor", cColor);
-        gui.draggerRgb("dColor", dColor);
+        gui.draggerRgb("aColor", rockObj.aColor);
+        gui.draggerRgb("bColor", rockObj.bColor);
+        gui.draggerRgb("cColor", rockObj.cColor);
+        gui.draggerRgb("dColor", rockObj.dColor);
 
         gui.separator();
 
         gui.textLine("Noise");
 
-        gui.sliderFloat("Color Strength", colorNoiseStrength, 0.0, 1.0);
-        gui.sliderFloat("Cracks Strength", cracksNoiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Color Strength", rockObj.colorNoiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Cracks Strength", rockObj.cracksNoiseStrength, 0.0, 1.0);
     }
-
 
     gui.separator();
 
@@ -189,7 +167,7 @@ shell.on("gl-render", function (t) {
         newSeed();
         newRock(gl);
     }
-    gui.textLine("Seed: " + seed);
+    gui.textLine("Seed: " + rockObj.seed);
 
     if (gui.button("New Rock")) {
         newRock(gl);
