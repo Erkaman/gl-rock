@@ -48,7 +48,7 @@ shell.on("gl-init", function () {
     gui = new createGui(gl);
     gui.windowSizes = [300, 530];
 
-    for(var i = 0; i < 1000; ++i)
+    for(var i = 0; i < 10000; ++i)
         newRock(gl);
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));

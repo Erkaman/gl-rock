@@ -5,7 +5,7 @@ function getNeighbours(positions, cells) {
 
     console.log("NEIGHT");
 
-    
+
     /*
      adjacentVertices[i] contains a set containing all the indices of the neighbours of the vertex with
      index i.
@@ -73,10 +73,10 @@ Projects the point `p` onto the plane defined by the normal `n` and the point `r
 function project(n, r0, p) {
     // For an explanation of the math, see http://math.stackexchange.com/a/100766
 
-    var scratchVec = vec3.create();
+    var scratchVec = [0,0,0];
     var t = vec3.dot(  n,  vec3.subtract(scratchVec, r0, p)  ) /  vec3.dot(n,n);
 
-    var projectedP = vec3.create();
+    var projectedP = [0,0,0];
     vec3.copy(projectedP, p);
     vec3.scaleAndAdd(projectedP, projectedP, n, t);
 
@@ -102,7 +102,7 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
     // and r is some arbitrary point on the plane.
     var n = normals[positionIndex];
 
-    var r0 = vec3.create();
+    var r0 = [0,0,0];
     vec3.copy(r0, centerPosition);
     vec3.scaleAndAdd(r0, r0, n, -strength);
 
@@ -123,12 +123,11 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
 
         var topPosition = positions[topIndex];
         // project onto plane.
-        var p = vec3.create();
+        var p = [0,0,0];
         vec3.copy(p, topPosition);
 
 
         var projectedP = project(n, r0, p);
-
 
         ++count;
         if(vec3.squaredDistance(projectedP, r0) < radius) {
@@ -136,22 +135,8 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
             positions[topIndex] = projectedP;
             normals[topIndex] = n;
         } else {
-
-            /*
-            borderVertices.push(topIndex);
-
-            var neighbourIndices = adjacentVertices[topIndex];
-            for(var i = 0; i < neighbourIndices.length; ++i) {
-                borderVertices.push(neighbourIndices[i]);
-            }*/
-
-
             continue;
         }
-
-        //normals[topIndex] = [0,0,0];
-
-
 
         var neighbourIndices = adjacentVertices[topIndex];
         for(var i = 0; i < neighbourIndices.length; ++i) {
@@ -159,82 +144,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, adja
         }
 
     }
-
-    /*
-    console.log("normal bla: n", n);
-
-    // fix normals on border:
-    borderFaceNormals = [];
-
-    for(var i = 0; i < borderVertices.length; ++i) {
-        var adjFaces = adjacentFaces[borderVertices[i]];
-
-        //  console.log("adj: ", adjFaces);
-
-
-        for(var j = 0; j < adjFaces.length; ++j) {
-            //console.log("faces ", i, adjFaces[j]);
-            var face = cells[adjFaces[j]];
-
-
-            if(!(typeof borderFaceNormals[adjFaces[j]] === 'undefined')) {
-                // console.log("CONTINUE");
-                continue;
-            }
-
-
-            // console.log("face ", i, face);
-
-            var p0 = positions[face[0]];
-            var p1 = positions[face[1]];
-            var p2 = positions[face[2]];
-
-            var v1 = vec3.create();
-            vec3.subtract(v1, p0, p1);
-
-            var v2 = vec3.create();
-            vec3.subtract(v2, p2, p1);
-
-            var n = vec3.create();
-            vec3.cross(n, v2, v1);
-            vec3.normalize(n,n);
-
-            //  console.log("n ", n);
-            borderFaceNormals[adjFaces[j]] = n;
-        }
-
-
-        // compute normals of every face.
-    }
-
-    // console.log("borderFaceNormals ", borderFaceNormals);
-
-
-
-    for(var i = 0; i < borderVertices.length; ++i) {
-        var adjFaces = adjacentFaces[borderVertices[i]];
-
-        var n = vec3.create();
-
-        for (var j = 0; j < adjFaces.length; ++j) {
-            // console.log("faces ", i, adjFaces[j]);
-
-            // console.log("normal: ", borderFaceNormals[adjFaces[j]]);
-
-            vec3.add(n,n,borderFaceNormals[adjFaces[j]]);
-
-            //console.log("n: ", i, n);
-        }
-        vec3.scale(n,n,1.0/adjFaces.length);
-        vec3.normalize(n,n);
-
-        //    normals[borderVertices[i]] = n;
-    }
-*/
-
-    //console.log("border vertices ", borderVertices);
-
-
 }
 
 /*

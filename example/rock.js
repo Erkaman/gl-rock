@@ -9,7 +9,6 @@ var createSphere = require('./sphere.js');
 var tooloud = require ('tooloud');
 var mat4 = require('gl-mat4');
 
-
 var adjacentVertices = null;
 var adjacentFaces = null;
 
@@ -53,7 +52,7 @@ function Rock(gl, obj) {
     var normals = sphere.normals;
 
     if(!adjacentVertices) {
-        // we are always using the same sphere as base for the rock,
+        // OPTIMIZATION: we are always using the same sphere as base for the rock,
         // so we only need to compute the adjacent positions once.
         var obj = scrape.getNeighbours(positions, cells);
         adjacentVertices = obj.adjacentVertices;
