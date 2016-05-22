@@ -13,8 +13,8 @@ var mat4 = require('gl-mat4');
 function Rock(gl, obj) {
 
     this.seed = obj.seed;
-    this.noiseScale = obj.noiseScale.val;
-    this.noiseStrength= obj.noiseStrength.val;
+    this.noiseScale = obj.meshNoiseScale.val;
+    this.noiseStrength= obj.meshNoiseStrength.val;
     this.scrapeCount= obj.scrapeCount.val;
     this.scrapeMinDist= obj.scrapeMinDist.val;
     this.scrapeStrength= obj.scrapeStrength.val;

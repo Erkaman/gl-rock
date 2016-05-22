@@ -34,8 +34,8 @@ var rockObj;
 
 rockObj = {
     seed:100,
-    noiseScale : {val: 2.0},
-    noiseStrength : {val: 0.2},
+    meshNoiseScale : {val: 2.0},
+    meshNoiseStrength : {val: 0.2},
     scrapeCount: {val: 7},
     scrapeMinDist: {val:0.8},
     scrapeStrength: {val:0.2},
@@ -126,8 +126,8 @@ shell.on("gl-render", function (t) {
     if(editMode.val == 0) {
         gui.textLine("Mesh");
 
-        gui.sliderFloat("Noise Scale", rockObj.noiseScale, 0.5, 5.0);
-        gui.sliderFloat("Noise Strength", rockObj.noiseStrength, 0.0, 1.0);
+        gui.sliderFloat("Noise Scale", rockObj.meshNoiseScale, 0.5, 5.0);
+        gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, 0.0, 1.0);
 
         gui.sliderInt("Scrape Count", rockObj.scrapeCount, 0, 15);
         gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, 0.1, 1.0);
@@ -145,8 +145,7 @@ shell.on("gl-render", function (t) {
         gui.separator();
 
         gui.textLine("Noise Palette");
-
-
+        
         gui.draggerRgb("aColor", rockObj.aColor);
         gui.draggerRgb("bColor", rockObj.bColor);
         gui.draggerRgb("cColor", rockObj.cColor);
