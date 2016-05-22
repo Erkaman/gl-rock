@@ -83,7 +83,7 @@ shell.on("gl-render", function (t) {
     demo1Shader.bind();
 
 
-    rock.draw(demo1Shader, view, projection, showTexture.val);
+    rock.draw(demo1Shader, view, projection, showTexture.val, [0.0, 0.0, 0.0]);
     
     var pressed = shell.wasDown("mouse-left");
     var io = {
@@ -196,8 +196,7 @@ shell.on("tick", function () {
         console.log("PP")
     }
     pDownPrev = pressed;
-
-
+    
     // if interacting with the GUI, do not let the mouse control the camera.
     if (gui.hasMouseFocus())
         return;

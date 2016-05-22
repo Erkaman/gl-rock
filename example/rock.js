@@ -135,11 +135,16 @@ var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
 
-Rock.prototype.draw = function (shader, view, projection, showTexture) {
+Rock.prototype.draw = function (shader, view, projection, showTexture, translation) {
     var scratchVec = vec3.create();
+
+    var model = mat4.create();
+    mat4.translate(model, model, translation);
 
     shader.uniforms.uView = view;
     shader.uniforms.uProjection = projection;
+    shader.uniforms.uModel = model;
+
     shader.uniforms.uDiffuseColor = demo1DiffuseColor;
     shader.uniforms.uAmbientLight = demo1AmbientLight;
     shader.uniforms.uLightColor = demo1LightColor;
