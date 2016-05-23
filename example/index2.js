@@ -61,7 +61,7 @@ shell.on("gl-init", function () {
             if(count > 4) {
 
                 rockObj = new RockObj();
-                rockObj.varyStrength = 2.0;
+                rockObj.varyStrength = 1.5;
 
                 rockObj.varyArray(rockObj.scale, 0, 0.4, SCALE_MIN, SCALE_MAX);
                 rockObj.varyArray(rockObj.scale, 1, 0.4, SCALE_MIN, SCALE_MAX);
@@ -75,7 +75,7 @@ shell.on("gl-init", function () {
 
             rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
 
-            rocks[i*ROCK_W + j] = new createRock(gl, rockObj );
+            rocks[j*ROCK_W + i] = new createRock(gl, rockObj );
             ++count;
 
             rockObj.varyStrength = 1.0;
@@ -127,7 +127,7 @@ shell.on("gl-render", function (t) {
 
             var translation = [(i)*ROCK_SPACING, 0.0, (j-ROCK_H/2.0)*ROCK_SPACING];
 
-            rocks[i*ROCK_W + j].draw(rockShader, view, projection, showTexture.val, translation);
+            rocks[j*ROCK_W + i].draw(rockShader, view, projection, showTexture.val, translation);
         }
     }
 
@@ -144,7 +144,7 @@ shell.on("gl-render", function (t) {
 
 });
 
-var freeCamera = true;
+var freeCamera = false;
 
 shell.on("tick", function () {
     var gl = shell.gl
@@ -154,17 +154,7 @@ shell.on("tick", function () {
 
         // if not free camera, make the camera traverse a set path.
 
-        camera.position[2] += cameraDirection;
-
-        // flip direction if reached edge.
-        if(camera.position[2] < -10) {
-            cameraDirection *= -1;
-        }
-        if(camera.position[2] > 260) {
-            cameraDirection *= -1;
-        }
-
-        camera.position[1] = 5 + 3*Math.sin(totalTime * 0.1);
+        //camera.position[0] += 0.1;
 
     } else {
         // if free camera, listen to keyboard and mouse input.
