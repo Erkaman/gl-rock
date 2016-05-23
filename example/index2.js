@@ -15,8 +15,10 @@ var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var createRock = require('./rock.js');
 var arrayShuffle = require('array-shuffle');
+var geoTransform = require('geo-3d-transform-mat4')
 
-var demo1Shader, bunnyGeo, sphereGeo;
+
+var rockShader, planeShader, bunnyGeo, sphereGeo;
 
 var rock;
 
@@ -44,7 +46,7 @@ shell.on("gl-init", function () {
     var gl = shell.gl
 
     gl.enable(gl.DEPTH_TEST);
-    gl.enable(gl.CULL_FACE);
+    gl.disable(gl.CULL_FACE);
     gl.cullFace(gl.BACK);
 
     rocks = [];
@@ -85,13 +87,21 @@ shell.on("gl-init", function () {
 
     planeGeo = createPlane(1, 1);
 
+    var model = mat4.create();
+    mat4.rotateX(model, model, Math.PI / 2);
+    mat4.translate(model, model, [0, 0.0, 0.9]);
+    mat4.scale(model, model, [1000, 1000, 1]);
+    planeGeo.positions = geoTransform(planeGeo.positions, model);
+
     planeGeo = Geometry(gl)
         .attr('aPosition', planeGeo.positions)
         .attr('aNormal', createNormals.vertexNormals(planeGeo.cells, planeGeo.positions))
-        .faces(planeGeo.cells)
+        .faces(planeGeo.cells);
 
 
-    demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
+    rockShader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
+    planeShader = glShader(gl, glslify("./plane_vert.glsl"), glslify("./plane_frag.glsl"));
+
 });
 
 shell.on("gl-render", function (t) {
@@ -110,16 +120,27 @@ shell.on("gl-render", function (t) {
 
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
 
-    demo1Shader.bind();
+    rockShader.bind();
 
     for(var i = 0; i < ROCK_W; ++i) {
         for (var j = 0; j < ROCK_H; ++j) {
 
             var translation = [(i)*ROCK_SPACING, 0.0, (j-ROCK_H/2.0)*ROCK_SPACING];
 
-            rocks[i*ROCK_W + j].draw(demo1Shader, view, projection, showTexture.val, translation);
+            rocks[i*ROCK_W + j].draw(rockShader, view, projection, showTexture.val, translation);
         }
     }
+
+
+    planeShader.bind();
+
+    planeShader.uniforms.uView = view;
+    planeShader.uniforms.uProjection = projection;
+
+    planeGeo.bind(planeShader);
+    planeGeo.draw();
+
+
 
 });
 
@@ -176,7 +197,6 @@ shell.on("tick", function () {
         } else {
             camera.velocity = 0.05;
         }
-
     }
 
     if (shell.wasDown("mouse-left")) {
