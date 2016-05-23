@@ -16,9 +16,6 @@ module.exports = function (self) {
 
         console.log(" worker got message ", msg.data);
 
-
-
-
         if(count > 4) {
 
             rockObj = new RockObj();
@@ -36,13 +33,13 @@ module.exports = function (self) {
 
         rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
 
-        var rock = new createRock(gl, rockObj );
+        var rock = new createRock(rockObj );
+
         ++count;
 
         rockObj.varyStrength = 1.0;
 
-
-        self.postMessage(rock);
+        self.postMessage(rock.positions);
     });
 };
 

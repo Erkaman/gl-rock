@@ -59,18 +59,18 @@ shell.on("gl-init", function () {
 
     var objCount = 0;
 
-  //  var worker = Work(require('./worker.js'));
+    /*
+    var worker = Work(require('./worker.js'));
 
-   // console.log("woker ", worker);
-
-/*
     worker.addEventListener('message', function (msg) {
 
         console.log("main got message ", msg.data);
 
         //++objCount;
 
-        rocks.push(msg.data);
+        var rock = msg.data;
+      //  rock.buildMesh(gl);
+      //  rocks.push(rock);
 
         worker.postMessage("work!");
 
@@ -80,12 +80,12 @@ shell.on("gl-init", function () {
         }
     });
 
-
     worker.postMessage("work!");
     console.log("DONE: ", objCount);
+    */
 
-    ///worker.terminate();
-*/
+
+
     
     for(var i = 0; i < ROCK_W; ++i) {
         //rocks[i] = []
@@ -117,6 +117,7 @@ shell.on("gl-init", function () {
             rockObj.varyStrength = 1.0;
         }
     }
+    
     
 
     rocks = arrayShuffle(rocks);
