@@ -3,9 +3,6 @@ var vec3 = require('gl-vec3');
 
 function getNeighbours(positions, cells) {
 
-    console.log("NEIGHT");
-
-
     /*
      adjacentVertices[i] contains a set containing all the indices of the neighbours of the vertex with
      index i.

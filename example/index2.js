@@ -3,7 +3,7 @@
 var mat4 = require('gl-mat4');
 var vec3 = require('gl-vec3');
 var glShader = require('gl-shader');
-var glslify = require('glslify')
+var glslify = require('glslify');
 var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
 var randomArray = require('random-array');
@@ -15,7 +15,8 @@ var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var createRock = require('./rock.js');
 var arrayShuffle = require('array-shuffle');
-var geoTransform = require('geo-3d-transform-mat4')
+var geoTransform = require('geo-3d-transform-mat4');
+var Worker = require('workerjs');
 
 
 var rockShader, planeShader, bunnyGeo, sphereGeo;
@@ -53,6 +54,28 @@ shell.on("gl-init", function () {
 
     var rockObj;
     var count = 5;
+
+    var objCount = 0;
+
+    var worker = new Worker('example/worker.js');
+    console.log("woker ", worker);
+    worker.onmessage = function (msg) {
+        console.log("main got message ", msg.data, objCount);
+
+        ++objCount;
+
+        worker.postMessage("work!");
+        if(objCount > 10)
+            worker.terminate();
+    };
+    worker.postMessage("work!");
+
+  /*  while(objCount < 10) {
+
+    }
+*/    console.log("DONE: ", objCount);
+
+    ///worker.terminate();
 
     for(var i = 0; i < ROCK_W; ++i) {
         //rocks[i] = []

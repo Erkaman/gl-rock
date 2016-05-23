@@ -33,7 +33,9 @@
     "random-item": "^1.0.0",
     "seed-random": "^2.2.0",
     "tooloud": "^1.0.0",
-    "vertices-bounding-box": "^1.0.0"
+    "vertices-bounding-box": "^1.0.0",
+    "web-worker": "^0.1.6",
+    "workerjs": "^0.1.1"
   },
   "dependencies": {
     "glsl-noise": "0.0.0"
