@@ -56,6 +56,9 @@ const MESH_NOISE_SCALE_MAX = 5.0;
 const NOISE_STRENGTH_MIN = 0.0;
 const NOISE_STRENGTH_MAX = 1.0;
 
+const MESH_NOISE_STRENGTH_MIN = 0.0;
+const MESH_NOISE_STRENGTH_MAX = 0.5;
+
 
 const SCRAPE_COUNT_MIN = 0;
 const SCRAPE_COUNT_MAX = 15;
@@ -67,9 +70,9 @@ const SCRAPE_STRENGTH_MIN = 0.1;
 const SCRAPE_STRENGTH_MAX = 0.6;
 
 const SCRAPE_RADIUS_MIN = 0.1;
-const SCRAPE_RADIUS_MAX = 1.0;
+const SCRAPE_RADIUS_MAX = 0.5;
 
-const SCALE_MIN = +0.0;
+const SCALE_MIN = +1.0;
 const SCALE_MAX = +2.0;
 
 function newRock(gl) {
@@ -120,7 +123,7 @@ function varyParameter(param, variance, min, max) {
 function randomizeMesh() {
 
     rockObj.meshNoiseScale.val = randomArray(MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX).oned(1)[0];
-    rockObj.meshNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
+    rockObj.meshNoiseStrength.val = randomArray(MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX).oned(1)[0];
 
     rockObj.scrapeCount.val = Math.floor(randomArray(SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX).oned(1)[0]);
     rockObj.scrapeMinDist.val = randomArray(SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX).oned(1)[0];
@@ -137,7 +140,7 @@ function varyMesh() {
 
     varyParameter(rockObj.meshNoiseScale, 0.1, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
 
-    varyParameter(rockObj.meshNoiseStrength, 0.1, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
+    varyParameter(rockObj.meshNoiseStrength, 0.1, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
 
 
     varyParameter(rockObj.scrapeCount, 2, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
@@ -273,7 +276,7 @@ shell.on("gl-render", function (t) {
 
         gui.sliderFloat("Noise Scale",
             rockObj.meshNoiseScale, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
-        gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
+        gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
 
         gui.sliderInt("Scrape Count", rockObj.scrapeCount, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
         gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);

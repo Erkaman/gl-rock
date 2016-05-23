@@ -10,6 +10,7 @@ function getNeighbours(positions, cells) {
      */
     var adjacentVertices = new Array(positions.length);
 
+    
     /*
      adjacentFaces[i] Contains all faces that are adjacent to the vertex with index i.
      */
