@@ -29,7 +29,7 @@ var editMode = {val: 0};
 var showTexture = {val: true};
 
 // number of rocks will be ROCK_N
-var ROCK_W = 10;
+var ROCK_W = 30;
 var ROCK_H = 10;
 
 var ROCK_SPACING = 4;
@@ -145,16 +145,16 @@ shell.on("gl-render", function (t) {
 
     rockShader.bind();
 
-    for(var i = 0; i < ROCK_W; ++i) {
-        for (var j = 0; j < ROCK_H; ++j) {
+    for(var i = 0; i < ROCK_W*ROCK_H; ++i) {
 
-            var translation = [(i)*ROCK_SPACING, 0.0, (j-ROCK_H/2.0)*ROCK_SPACING];
+        var w = Math.floor(i / ROCK_H);
+        var h = Math.floor(i % ROCK_H);
 
-            rocks[j*ROCK_W + i].draw(rockShader, view, projection, showTexture.val, translation);
-        }
+        var translation = [(w) * ROCK_SPACING, 0.0, (h - ROCK_H / 2.0) * ROCK_SPACING];
+
+        rocks[h * ROCK_W + w].draw(rockShader, view, projection, showTexture.val, translation);
     }
-
-
+    
     planeShader.bind();
 
     planeShader.uniforms.uView = view;
