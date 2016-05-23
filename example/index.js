@@ -52,16 +52,16 @@ rockObj = {
 
 const MESH_NOISE_SCALE_MIN = 0.5;
 const MESH_NOISE_SCALE_MAX = 5.0;
-const MESH_NOISE_SCALE_VARY = 0.1;
+const MESH_NOISE_SCALE_VARY = 0.05;
 
 const NOISE_STRENGTH_MIN = 0.0;
 const NOISE_STRENGTH_MAX = 1.0;
-const NOISE_STRENGTH_VARY= 0.1;
+const NOISE_STRENGTH_VARY= 0.05;
 
 
 const MESH_NOISE_STRENGTH_MIN = 0.0;
 const MESH_NOISE_STRENGTH_MAX = 0.5;
-const MESH_NOISE_STRENGTH_VARY = 0.1;
+const MESH_NOISE_STRENGTH_VARY = 0.05;
 
 
 const SCRAPE_COUNT_MIN = 0;
@@ -70,20 +70,21 @@ const SCRAPE_COUNT_VARY = 2;
 
 const SCRAPE_MIN_DIST_MIN = 0.1;
 const SCRAPE_MIN_DIST_MAX = 1.0;
-const SCRAPE_MIN_DIST_VARY = 0.1;
+const SCRAPE_MIN_DIST_VARY = 0.05;
 
 const SCRAPE_STRENGTH_MIN = 0.1;
 const SCRAPE_STRENGTH_MAX = 0.6;
-const SCRAPE_STRENGTH_VARY = 0.1;
+const SCRAPE_STRENGTH_VARY = 0.05;
 
 const SCRAPE_RADIUS_MIN = 0.1;
 const SCRAPE_RADIUS_MAX = 0.5;
-const SCRAPE_RADIUS_VARY = 0.1;
+const SCRAPE_RADIUS_VARY = 0.05;
 
 const SCALE_MIN = +1.0;
 const SCALE_MAX = +2.0;
+const SCALE_VARY = 0.1;
 
-const COLOR_VARY = 0.1;
+const COLOR_VARY = 0.03;
 
 function newRock(gl) {
 
@@ -99,10 +100,10 @@ shell.on("gl-init", function () {
     gl.enable(gl.CULL_FACE);
     gl.cullFace(gl.BACK)
 
-    paletteDrawer = new PaletteDrawer(gl, [030, 540], [380, 600] );
+    paletteDrawer = new PaletteDrawer(gl, [030, 580], [380, 640] );
 
     gui = new createGui(gl);
-    gui.windowSizes = [300, 480];
+    gui.windowSizes = [300, 530];
 
     newRock(gl);
 
@@ -169,7 +170,7 @@ function varyMesh() {
 
     var scale = rockObj.scale;
 
-    var VARY = 0.3;
+    var VARY = SCALE_VARY;
 
     scale[0] += randomArray(-VARY, +VARY).oned(1)[0];
     if(scale[0] >  MESH_NOISE_SCALE_MAX) scale[0] = MESH_NOISE_SCALE_MAX;
