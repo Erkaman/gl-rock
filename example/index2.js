@@ -6,17 +6,19 @@ var glShader = require('gl-shader');
 var glslify = require('glslify');
 var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
-var randomArray = require('random-array');
 var randomItem = require('random-item');
-var RockObj = require('./rock_obj.js');
 var createMovableCamera = require('gl-movable-camera');
 var createPlane = require('primitive-plane');
 var createNormals = require('normals');
 var Geometry = require('gl-geometry');
-var createRock = require('./rock.js');
 var arrayShuffle = require('array-shuffle');
 var geoTransform = require('geo-3d-transform-mat4');
-var Worker = require('workerjs');
+var WorkerJs = require('workerjs');
+var Work = require('webworkify');
+
+var RockObj = require('./rock_obj.js');
+var createRock = require('./rock.js');
+var randomArray = require('random-array');
 
 
 var rockShader, planeShader, bunnyGeo, sphereGeo;
@@ -29,7 +31,7 @@ var editMode = {val: 0};
 var showTexture = {val: true};
 
 // number of rocks will be ROCK_N
-var ROCK_W = 30;
+var ROCK_W = 20;
 var ROCK_H = 10;
 
 var ROCK_SPACING = 4;
@@ -57,26 +59,34 @@ shell.on("gl-init", function () {
 
     var objCount = 0;
 
-    var worker = new Worker('example/worker.js');
-    console.log("woker ", worker);
-    worker.onmessage = function (msg) {
-        console.log("main got message ", msg.data, objCount);
+  //  var worker = Work(require('./worker.js'));
 
-        ++objCount;
+   // console.log("woker ", worker);
+
+/*
+    worker.addEventListener('message', function (msg) {
+
+        console.log("main got message ", msg.data);
+
+        //++objCount;
+
+        rocks.push(msg.data);
 
         worker.postMessage("work!");
-        if(objCount > 10)
+
+        if(rocks.length > ROCK_W*ROCK_H) {
             worker.terminate();
-    };
+            console.log("done working");
+        }
+    });
+
+
     worker.postMessage("work!");
-
-  /*  while(objCount < 10) {
-
-    }
-*/    console.log("DONE: ", objCount);
+    console.log("DONE: ", objCount);
 
     ///worker.terminate();
-
+*/
+    
     for(var i = 0; i < ROCK_W; ++i) {
         //rocks[i] = []
         for (var j = 0; j < ROCK_H; ++j) {
@@ -97,14 +107,17 @@ shell.on("gl-init", function () {
             rockObj.seed = Math.round(randomArray(0, 1000000).oned(1)[0]);
 
             rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
-
-            rocks[j*ROCK_W + i] = new createRock(gl, rockObj );
+            
+            var obj = new createRock(rockObj );
+            obj.buildMesh(gl);
+          
+            rocks[j*ROCK_W + i] = obj;
             ++count;
 
             rockObj.varyStrength = 1.0;
-
         }
     }
+    
 
     rocks = arrayShuffle(rocks);
 
@@ -145,7 +158,7 @@ shell.on("gl-render", function (t) {
 
     rockShader.bind();
 
-    for(var i = 0; i < ROCK_W*ROCK_H; ++i) {
+    for(var i = 0; i < /*ROCK_W*ROCK_H*/ rocks.length; ++i) {
 
         var w = Math.floor(i / ROCK_H);
         var h = Math.floor(i % ROCK_H);
@@ -154,7 +167,7 @@ shell.on("gl-render", function (t) {
 
         rocks[h * ROCK_W + w].draw(rockShader, view, projection, showTexture.val, translation);
     }
-    
+
     planeShader.bind();
 
     planeShader.uniforms.uView = view;

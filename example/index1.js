@@ -31,7 +31,8 @@ var showTexture = {val: true};
 var rockObj = new RockObj();
 
 function newRock(gl) {
-    rock = new createRock(gl, rockObj );
+    rock = new createRock(rockObj );
+    rock.buildMesh(gl);
 }
 
 shell.on("gl-init", function () {

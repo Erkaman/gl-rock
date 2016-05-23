@@ -11,7 +11,7 @@ var mat4 = require('gl-mat4');
 var adjacentVertices = null;
 var adjacentFaces = null;
 
-function Rock(gl, obj) {
+function Rock(obj) {
 
     this.seed = obj.seed;
     this.noiseScale = obj.meshNoiseScale.val;
@@ -125,12 +125,11 @@ function Rock(gl, obj) {
     // of course, we must recompute the normals.
     var normals = createNormals.vertexNormals(cells, positions);
 
-    this.sphereGeo = Geometry(gl)
-        .attr('aPosition', positions)
-        .attr('aNormal',
-            normals
-        )
-        .faces(cells);
+
+    this.positions = positions;
+    this.normals = normals;
+    this.cells = cells;
+
 }
 
 var demo1DiffuseColor = [0.40, 0.40, 0.40];
@@ -139,6 +138,16 @@ var demo1LightColor = [0.40, 0.40, 0.4];
 var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
+
+Rock.prototype.buildMesh = function (gl) {
+
+    this.sphereGeo = Geometry(gl)
+        .attr('aPosition', this.positions)
+        .attr('aNormal',
+            this.normals
+        )
+        .faces(this.cells);
+}
 
 Rock.prototype.draw = function (shader, view, projection, showTexture, translation) {
     var scratchVec = vec3.create();
