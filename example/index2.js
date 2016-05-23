@@ -17,7 +17,13 @@ var WorkerJs = require('workerjs');
 var Work = require('webworkify');
 
 var RockObj = require('./rock_obj.js');
-var createRock = require('./rock.js');
+
+
+
+var createRock = require('./rock.js').createRock;
+var buildRockMesh = require('./rock.js').buildRockMesh;
+var drawRock = require('./rock.js').drawRock;
+
 var randomArray = require('random-array');
 
 
@@ -31,8 +37,13 @@ var editMode = {val: 0};
 var showTexture = {val: true};
 
 // number of rocks will be ROCK_N
+/*
+var ROCK_W = 10;
+var ROCK_H = 10;
+*/
 var ROCK_W = 20;
 var ROCK_H = 10;
+
 
 var ROCK_SPACING = 4;
 
@@ -59,8 +70,9 @@ shell.on("gl-init", function () {
 
     var objCount = 0;
 
-    /*
+
     var worker = Work(require('./worker.js'));
+
 
     worker.addEventListener('message', function (msg) {
 
@@ -70,7 +82,9 @@ shell.on("gl-init", function () {
 
         var rock = msg.data;
       //  rock.buildMesh(gl);
-      //  rocks.push(rock);
+
+        buildRockMesh(gl, rock);
+        rocks.push(rock);
 
         worker.postMessage("work!");
 
@@ -82,11 +96,12 @@ shell.on("gl-init", function () {
 
     worker.postMessage("work!");
     console.log("DONE: ", objCount);
-    */
 
 
 
-    
+
+
+    /*
     for(var i = 0; i < ROCK_W; ++i) {
         //rocks[i] = []
         for (var j = 0; j < ROCK_H; ++j) {
@@ -108,17 +123,17 @@ shell.on("gl-init", function () {
 
             rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
             
-            var obj = new createRock(rockObj );
-            obj.buildMesh(gl);
-          
-            rocks[j*ROCK_W + i] = obj;
+            var rock = createRock(rockObj );
+            buildRockMesh(gl, rock);
+
+            rocks[j*ROCK_W + i] = rock;
             ++count;
 
             rockObj.varyStrength = 1.0;
         }
     }
-    
-    
+    */
+
 
     rocks = arrayShuffle(rocks);
 
@@ -161,22 +176,26 @@ shell.on("gl-render", function (t) {
 
     for(var i = 0; i < /*ROCK_W*ROCK_H*/ rocks.length; ++i) {
 
+
         var w = Math.floor(i / ROCK_H);
         var h = Math.floor(i % ROCK_H);
 
         var translation = [(w) * ROCK_SPACING, 0.0, (h - ROCK_H / 2.0) * ROCK_SPACING];
+        
+        var rock = rocks[w * ROCK_H +h];
+        drawRock(rockShader, view, projection, showTexture.val, translation, rock);
 
-        rocks[h * ROCK_W + w].draw(rockShader, view, projection, showTexture.val, translation);
+
     }
 
-    planeShader.bind();
+  /*  planeShader.bind();
 
     planeShader.uniforms.uView = view;
     planeShader.uniforms.uProjection = projection;
 
     planeGeo.bind(planeShader);
     planeGeo.draw();
-
+*/
 
 
 });

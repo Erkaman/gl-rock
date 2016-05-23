@@ -11,38 +11,39 @@ var mat4 = require('gl-mat4');
 var adjacentVertices = null;
 var adjacentFaces = null;
 
-function Rock(obj) {
+function Rock(rockObj) {
+    var rock = {};
 
-    this.seed = obj.seed;
-    this.noiseScale = obj.meshNoiseScale.val;
-    this.noiseStrength= obj.meshNoiseStrength.val;
-    this.scrapeCount= obj.scrapeCount.val;
-    this.scrapeMinDist= obj.scrapeMinDist.val;
-    this.scrapeStrength= obj.scrapeStrength.val;
-    this.scrapeRadius= obj.scrapeRadius.val;
-    this.aColor= obj.aColor;
-    this.bColor= obj.bColor;
-    this.cColor= obj.cColor;
-    this.dColor= obj.dColor;
+    rock.seed = rockObj.seed;
+    rock.noiseScale = rockObj.meshNoiseScale.val;
+    rock.noiseStrength= rockObj.meshNoiseStrength.val;
+    rock.scrapeCount= rockObj.scrapeCount.val;
+    rock.scrapeMinDist= rockObj.scrapeMinDist.val;
+    rock.scrapeStrength= rockObj.scrapeStrength.val;
+    rock.scrapeRadius= rockObj.scrapeRadius.val;
+    rock.aColor= rockObj.aColor;
+    rock.bColor= rockObj.bColor;
+    rock.cColor= rockObj.cColor;
+    rock.dColor= rockObj.dColor;
 
-//    console.log("radius: ", this.scrapeStrength);
+//    console.log("radius: ", rock.scrapeStrength);
 
-    this.scale= obj.scale;
+    rock.scale= rockObj.scale;
 
-    this.colorNoiseStrength = obj.colorNoiseStrength.val;
-    this.cracksNoiseStrength = obj.cracksNoiseStrength.val;
+    rock.colorNoiseStrength = rockObj.colorNoiseStrength.val;
+    rock.cracksNoiseStrength = rockObj.cracksNoiseStrength.val;
 
 
     var simple = [
         [0.0, [0,0,0] ],
-        [0.25,this.bColor],
-        [0.5, this.cColor],
-        [1.0, this.dColor],
+        [0.25,rock.bColor],
+        [0.5, rock.cColor],
+        [1.0, rock.dColor],
     ];
 
 
 
-    this.Random = seedRandom(this.seed);
+    var rand = seedRandom(rock.seed);
 
     var sphere = createSphere({stacks: 20, slices: 20})
 
@@ -53,20 +54,20 @@ function Rock(obj) {
     if(!adjacentVertices) {
         // OPTIMIZATION: we are always using the same sphere as base for the rock,
         // so we only need to compute the adjacent positions once.
-        var obj = scrape.getNeighbours(positions, cells);
-        var adjacentVertices = obj.adjacentVertices;
+        var rockObj = scrape.getNeighbours(positions, cells);
+        var adjacentVertices = rockObj.adjacentVertices;
     }
 
     // generate positions at which to scrape.
     var scrapeIndices = [];
 
-    for (var i = 0; i < this.scrapeCount; ++i) {
+    for (var i = 0; i < rock.scrapeCount; ++i) {
 
         var attempts = 0;
 
         while (true) {
 
-            var randIndex = Math.floor(positions.length * this.Random());
+            var randIndex = Math.floor(positions.length * rand());
             var p = positions[randIndex];
 
             var tooClose = false;
@@ -75,7 +76,7 @@ function Rock(obj) {
 
                 var q = positions[scrapeIndices[j]];
 
-                if (vec3.distance(p, q) <this.scrapeMinDist) {
+                if (vec3.distance(p, q) <rock.scrapeMinDist) {
                     tooClose = true;
                     break;
                 }
@@ -97,7 +98,7 @@ function Rock(obj) {
     for (var i = 0; i < scrapeIndices.length; ++i) {
         scrape.scrape(
             scrapeIndices[i], positions, cells, normals,
-            adjacentVertices, this.scrapeStrength, this.scrapeRadius);
+            adjacentVertices, rock.scrapeStrength, rock.scrapeRadius);
 
     }
 
@@ -106,10 +107,10 @@ function Rock(obj) {
 
 
         var noise =
-            this.noiseStrength*tooloud.Perlin.noise(
-                this.noiseScale*p[0],
-                this.noiseScale*p[1],
-                this.noiseScale*p[2] );
+            rock.noiseStrength*tooloud.Perlin.noise(
+                rock.noiseScale*p[0],
+                rock.noiseScale*p[1],
+                rock.noiseScale*p[2] );
 
 
         positions[i][0] += noise;
@@ -117,18 +118,20 @@ function Rock(obj) {
         positions[i][2] += noise;
 
 
-        positions[i][0] *= this.scale[0];
-        positions[i][1] *= this.scale[1];
-        positions[i][2] *= this.scale[2];
+        positions[i][0] *= rock.scale[0];
+        positions[i][1] *= rock.scale[1];
+        positions[i][2] *= rock.scale[2];
     }
 
     // of course, we must recompute the normals.
     var normals = createNormals.vertexNormals(cells, positions);
 
 
-    this.positions = positions;
-    this.normals = normals;
-    this.cells = cells;
+    rock.positions = positions;
+    rock.normals = normals;
+    rock.cells = cells;
+    
+    return rock;
 
 }
 
@@ -139,17 +142,17 @@ var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
 
-Rock.prototype.buildMesh = function (gl) {
+ function buildRockMesh (gl, rock) {
 
-    this.sphereGeo = Geometry(gl)
-        .attr('aPosition', this.positions)
+    rock.sphereGeo = Geometry(gl)
+        .attr('aPosition', rock.positions)
         .attr('aNormal',
-            this.normals
+            rock.normals
         )
-        .faces(this.cells);
+        .faces(rock.cells);
 }
 
-Rock.prototype.draw = function (shader, view, projection, showTexture, translation) {
+ function drawRock(shader, view, projection, showTexture, translation, rock) {
     var scratchVec = vec3.create();
 
     var model = mat4.create();
@@ -166,14 +169,14 @@ Rock.prototype.draw = function (shader, view, projection, showTexture, translati
     shader.uniforms.uEyePos = cameraPosFromViewMatrix(scratchVec, view);
     shader.uniforms.uSpecularPower = demo1SpecularPower.val;
     shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
-    shader.uniforms.uSeed = this.seed;
+    shader.uniforms.uSeed = rock.seed;
 
-    shader.uniforms.uBColor = this.bColor;
-    shader.uniforms.uCColor = this.cColor;
-    shader.uniforms.uDColor = this.dColor;
+    shader.uniforms.uBColor = rock.bColor;
+    shader.uniforms.uCColor = rock.cColor;
+    shader.uniforms.uDColor = rock.dColor;
 
-    shader.uniforms.uColorNoiseStrength = this.colorNoiseStrength;
-    shader.uniforms.uCracksNoiseStrength = this.cracksNoiseStrength;
+    shader.uniforms.uColorNoiseStrength = rock.colorNoiseStrength;
+    shader.uniforms.uCracksNoiseStrength = rock.cracksNoiseStrength;
 
 
 
@@ -181,8 +184,11 @@ Rock.prototype.draw = function (shader, view, projection, showTexture, translati
     shader.uniforms.uShowTexture = showTexture;
 
 
-    this.sphereGeo.bind(shader);
-    this.sphereGeo.draw();
+    rock.sphereGeo.bind(shader);
+    rock.sphereGeo.draw();
 }
 
-module.exports = Rock;
+module.exports.createRock = Rock;
+module.exports.buildRockMesh = buildRockMesh;
+module.exports.drawRock = drawRock;
+

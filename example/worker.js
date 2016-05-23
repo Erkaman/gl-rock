@@ -3,8 +3,8 @@
  */
 
 var RockObj = require('./rock_obj.js');
-var createRock = require('./rock.js');
 var randomArray = require('random-array');
+var createRock = require('./rock.js').createRock;
 
 module.exports = function (self) {
 
@@ -33,13 +33,13 @@ module.exports = function (self) {
 
         rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
 
-        var rock = new createRock(rockObj );
+        var rock = createRock(rockObj );
 
         ++count;
 
         rockObj.varyStrength = 1.0;
 
-        self.postMessage(rock.positions);
+        self.postMessage(rock);
     });
 };
 

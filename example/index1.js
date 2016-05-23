@@ -10,10 +10,12 @@ var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var randomItem = require('random-item');
 var RockObj = require('./rock_obj.js');
-var createPlane = require('primitive-plane')
+var createPlane = require('primitive-plane');
 
+var createRock = require('./rock.js').createRock;
+var buildRockMesh = require('./rock.js').buildRockMesh;
+var drawRock = require('./rock.js').drawRock;
 
-var createRock = require('./rock.js');
 
 var demo1Shader, bunnyGeo, sphereGeo;
 
@@ -31,8 +33,10 @@ var showTexture = {val: true};
 var rockObj = new RockObj();
 
 function newRock(gl) {
-    rock = new createRock(rockObj );
-    rock.buildMesh(gl);
+
+    rock = createRock(rockObj );
+
+    buildRockMesh(gl, rock);
 }
 
 shell.on("gl-init", function () {
@@ -79,8 +83,8 @@ shell.on("gl-render", function (t) {
     demo1Shader.bind();
 
 
-    rock.draw(demo1Shader, view, projection, showTexture.val, [0.0, 0.0, 0.0]);
-    
+    drawRock(demo1Shader, view, projection, showTexture.val, [0.0, 0.0, 0.0], rock);
+
     var pressed = shell.wasDown("mouse-left");
     var io = {
         mouseLeftDownCur: pressed,
