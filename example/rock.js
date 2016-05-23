@@ -25,6 +25,8 @@ function Rock(gl, obj) {
     this.cColor= obj.cColor;
     this.dColor= obj.dColor;
 
+//    console.log("radius: ", this.scrapeStrength);
+
     this.scale= obj.scale;
 
     this.colorNoiseStrength = obj.colorNoiseStrength.val;
@@ -52,7 +54,7 @@ function Rock(gl, obj) {
         // OPTIMIZATION: we are always using the same sphere as base for the rock,
         // so we only need to compute the adjacent positions once.
         var obj = scrape.getNeighbours(positions, cells);
-        adjacentVertices = obj.adjacentVertices;
+        var adjacentVertices = obj.adjacentVertices;
     }
 
     // generate positions at which to scrape.
@@ -121,9 +123,9 @@ function Rock(gl, obj) {
     }
 
     // of course, we must recompute the normals.
-    normals = createNormals.vertexNormals(cells, positions);
+    var normals = createNormals.vertexNormals(cells, positions);
 
-    sphereGeo = Geometry(gl)
+    this.sphereGeo = Geometry(gl)
         .attr('aPosition', positions)
         .attr('aNormal',
             normals
@@ -170,8 +172,8 @@ Rock.prototype.draw = function (shader, view, projection, showTexture, translati
     shader.uniforms.uShowTexture = showTexture;
 
 
-    sphereGeo.bind(shader);
-    sphereGeo.draw();
+    this.sphereGeo.bind(shader);
+    this.sphereGeo.draw();
 }
 
 module.exports = Rock;

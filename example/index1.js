@@ -10,6 +10,8 @@ var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var randomItem = require('random-item');
 var RockObj = require('./rock_obj.js');
+var createPlane = require('primitive-plane')
+
 
 var createRock = require('./rock.js');
 
@@ -45,6 +47,8 @@ shell.on("gl-init", function () {
  //  for(var i = 0; i < 1000; ++i)
         newRock(gl);
 
+    
+    
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 
     camera.rotate([0,0], [0,0] );

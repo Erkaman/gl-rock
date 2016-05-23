@@ -22,6 +22,8 @@ function RockObj() {
     this.colorNoiseStrength = {val: 1.0};
     this.cracksNoiseStrength = {val: 0.3};
     this.scale = [1.0, 1.0, 1.0];
+    
+    this.varyStrength = 1.0;
 
 }
 
@@ -69,13 +71,19 @@ RockObj.prototype.randomizeNoise = function () {
     this.cracksNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
 }
 
+RockObj.prototype.varyParameter = function varyParameter(param, variance, min, max) {
 
-function varyParameter(param, variance, min, max) {
-
-    param.val += randomArray(-variance, +variance).oned(1)[0];
+    param.val += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
     if (param.val > max) param.val = max;
     if (param.val < min) param.val = min;
 
+}
+
+RockObj.prototype.varyArray = function (arr, i, variance, min, max) {
+
+    arr[i] += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
+    if (arr[i] > max) arr[i] = max;
+    if (arr[i] < min) arr[i] = min;
 }
 
 
@@ -98,19 +106,19 @@ RockObj.prototype.randomizeMesh = function () {
 RockObj.prototype.varyMesh = function () {
 
 
-    varyParameter(this.meshNoiseScale,
+    this.varyParameter(this.meshNoiseScale,
         MESH_NOISE_SCALE_VARY, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
 
-    varyParameter(this.meshNoiseStrength,
+    this.varyParameter(this.meshNoiseStrength,
         MESH_NOISE_STRENGTH_VARY, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
 
 
-    varyParameter(this.scrapeCount, SCRAPE_COUNT_VARY, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
+    this.varyParameter(this.scrapeCount, SCRAPE_COUNT_VARY, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
 
-    varyParameter(this.scrapeMinDist, SCRAPE_MIN_DIST_VARY, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
-    varyParameter(this.scrapeStrength, SCRAPE_STRENGTH_VARY, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
+    this.varyParameter(this.scrapeMinDist, SCRAPE_MIN_DIST_VARY, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
+    this.varyParameter(this.scrapeStrength, SCRAPE_STRENGTH_VARY, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
 
-    varyParameter(this.scrapeRadius, SCRAPE_RADIUS_VARY, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
+    this.varyParameter(this.scrapeRadius, SCRAPE_RADIUS_VARY, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
 
     //
@@ -120,27 +128,19 @@ RockObj.prototype.varyMesh = function () {
 
     var VARY = SCALE_VARY;
 
-    scale[0] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (scale[0] > MESH_NOISE_SCALE_MAX) scale[0] = MESH_NOISE_SCALE_MAX;
-    if (scale[0] < MESH_NOISE_SCALE_MIN) scale[0] = MESH_NOISE_SCALE_MIN;
 
 
-    scale[1] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (scale[1] > MESH_NOISE_SCALE_MAX) scale[1] = MESH_NOISE_SCALE_MAX;
-    if (scale[1] < MESH_NOISE_SCALE_MIN) scale[1] = MESH_NOISE_SCALE_MIN;
-
-
-    scale[2] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (scale[2] > MESH_NOISE_SCALE_MAX) scale[2] = MESH_NOISE_SCALE_MAX;
-    if (scale[2] < MESH_NOISE_SCALE_MIN) scale[2] = MESH_NOISE_SCALE_MIN;
-}
+    this.varyArray(scale, 0, SCALE_VARY, SCALE_MIN, SCALE_MAX);
+    this.varyArray(scale, 1, SCALE_VARY, SCALE_MIN, SCALE_MAX);
+    this.varyArray(scale, 2, SCALE_VARY, SCALE_MIN, SCALE_MAX);
+};
 
 
 RockObj.prototype.varyNoise = function () {
 
-    varyParameter(this.colorNoiseStrength,
+    this.varyParameter(this.colorNoiseStrength,
         NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
-    varyParameter(this.cracksNoiseStrength,
+    this.varyParameter(this.cracksNoiseStrength,
         NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
 }
 
@@ -151,30 +151,22 @@ RockObj.prototype.randomizeColor = function () {
     this.dColor = randomArray(0, 1).oned(3);
 }
 
-function varyColorHelper(color) {
+
+
+RockObj.prototype.varyColorHelper = function (color) {
 
     var VARY = COLOR_VARY;
 
-    color[0] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (color[0] > 1.0) color[0] = 1.0;
-    if (color[0] < 0.0) color[0] = 0.0;
-
-
-    color[1] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (color[1] > 1.0) color[1] = 1.0;
-    if (color[1] < 0.0) color[1] = 0.0;
-
-
-    color[2] += randomArray(-VARY, +VARY).oned(1)[0];
-    if (color[2] > 1.0) color[2] = 1.0;
-    if (color[2] < 0.0) color[2] = 0.0;
+    this.varyArray(color, 0, COLOR_VARY, 0.0, 1.0);
+    this.varyArray(color, 1, COLOR_VARY, 0.0, 1.0);
+    this.varyArray(color, 2, COLOR_VARY, 0.0, 1.0);
 }
 
 RockObj.prototype.varyColor = function () {
-    varyColorHelper(this.aColor);
-    varyColorHelper(this.bColor);
-    varyColorHelper(this.cColor);
-    varyColorHelper(this.dColor);
+    this.varyColorHelper(this.aColor);
+    this.varyColorHelper(this.bColor);
+    this.varyColorHelper(this.cColor);
+    this.varyColorHelper(this.dColor);
 }
 
 

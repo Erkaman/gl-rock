@@ -9,10 +9,12 @@ var shell = require("gl-now")();
 var randomArray = require('random-array');
 var randomItem = require('random-item');
 var RockObj = require('./rock_obj.js');
-var createMovableCamera = require('gl-movable-camera')
-
-
+var createMovableCamera = require('gl-movable-camera');
+var createPlane = require('primitive-plane');
+var createNormals = require('normals');
+var Geometry = require('gl-geometry');
 var createRock = require('./rock.js');
+var arrayShuffle = require('array-shuffle');
 
 var demo1Shader, bunnyGeo, sphereGeo;
 
@@ -24,16 +26,19 @@ var editMode = {val: 0};
 var showTexture = {val: true};
 
 // number of rocks will be ROCK_N
-var ROCK_N = 10;
+var ROCK_W = 10;
+var ROCK_H = 10;
+
 var ROCK_SPACING = 4;
 
 var rocks;
 
 var camera = createMovableCamera({
-    position: vec3.fromValues(-2.0, 0.0, 0.0),
-    viewDir: vec3.fromValues(1.0, 0.0, 0)
+    position: vec3.fromValues(-2.0, 6.0, 0.0),
+    viewDir: vec3.fromValues(1.0, -0.3, 0)
 });
 
+var planeGeo;
 
 shell.on("gl-init", function () {
     var gl = shell.gl
@@ -43,24 +48,48 @@ shell.on("gl-init", function () {
     gl.cullFace(gl.BACK);
 
     rocks = [];
-    
-    for(var i = 0; i < ROCK_N; ++i) {
-        rocks[i] = []
-        for (var j = 0; j < ROCK_N; ++j) {
-            var rockObj = new RockObj();
+
+    var rockObj;
+    var count = 5;
+
+    for(var i = 0; i < ROCK_W; ++i) {
+        //rocks[i] = []
+        for (var j = 0; j < ROCK_H; ++j) {
+
+            if(count > 4) {
+
+                rockObj = new RockObj();
+                rockObj.varyStrength = 2.0;
+
+                rockObj.varyArray(rockObj.scale, 0, 0.4, SCALE_MIN, SCALE_MAX);
+                rockObj.varyArray(rockObj.scale, 1, 0.4, SCALE_MIN, SCALE_MAX);
+                rockObj.varyArray(rockObj.scale, 2, 0.4, SCALE_MIN, SCALE_MAX);
+
+                count = 0;
+            }
 
             // always use an unique seed.
             rockObj.seed = Math.round(randomArray(0, 1000000).oned(1)[0]);
 
-            // slightly vary rock.
             rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh();
 
-            rocks[i][j] = new createRock(gl, rockObj );
+            rocks[i*ROCK_W + j] = new createRock(gl, rockObj );
+            ++count;
+
+            rockObj.varyStrength = 1.0;
+
         }
     }
 
-    //  for(var i = 0; i < 1000; ++i)
-    //newRock(gl);
+    rocks = arrayShuffle(rocks);
+
+    planeGeo = createPlane(1, 1);
+
+    planeGeo = Geometry(gl)
+        .attr('aPosition', planeGeo.positions)
+        .attr('aNormal', createNormals.vertexNormals(planeGeo.cells, planeGeo.positions))
+        .faces(planeGeo.cells)
+
 
     demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 });
@@ -83,13 +112,12 @@ shell.on("gl-render", function (t) {
 
     demo1Shader.bind();
 
-    for(var i = 0; i < ROCK_N; ++i) {
-        for (var j = 0; j < ROCK_N; ++j) {
+    for(var i = 0; i < ROCK_W; ++i) {
+        for (var j = 0; j < ROCK_H; ++j) {
 
-            var translation = [(i-ROCK_N/2.0)*ROCK_SPACING, 0.0, (j-ROCK_N/2.0)*ROCK_SPACING];
+            var translation = [(i)*ROCK_SPACING, 0.0, (j-ROCK_H/2.0)*ROCK_SPACING];
 
-
-            rocks[i][j].draw(demo1Shader, view, projection, showTexture.val, translation);
+            rocks[i*ROCK_W + j].draw(demo1Shader, view, projection, showTexture.val, translation);
         }
     }
 
