@@ -6,8 +6,7 @@
     "start": "budo --verbose example/index1.js -t glslify --live --open",
     "test": "standard"
   },
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "Eric Arnebäck <arnebackeric@gmail.com> (https://github.com/Erkaman)",
   "license": "MIT",
   "devDependencies": {
@@ -17,6 +16,7 @@
     "gl-camera-pos-from-view-matrix": "^1.0.1",
     "gl-geometry": "^3.1.0",
     "gl-mat4": "^1.1.4",
+    "gl-movable-camera": "^1.0.1",
     "gl-now": "^1.4.0",
     "gl-shader": "^4.2.0",
     "gl-vec3": "^1.0.3",
