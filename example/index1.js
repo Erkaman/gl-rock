@@ -115,11 +115,11 @@ shell.on("gl-render", function (t) {
         gui.sliderFloat("Noise Strength", rockObj.meshNoiseStrength, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
 
         gui.sliderInt("Scrape Count", rockObj.scrapeCount, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
-        gui.sliderFloat("scrapeMinDist", rockObj.scrapeMinDist, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
+        gui.sliderFloat("Scrape Min Dist", rockObj.scrapeMinDist, SCRAPE_MIN_DIST_MIN, SCRAPE_MIN_DIST_MAX);
 
-        gui.sliderFloat("scrapeStrength",
+        gui.sliderFloat("Scrape Strength",
             rockObj.scrapeStrength, SCRAPE_STRENGTH_MIN, SCRAPE_STRENGTH_MAX);
-        gui.sliderFloat("scrapeRadius", rockObj.scrapeRadius, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
+        gui.sliderFloat("Scrape Radius", rockObj.scrapeRadius, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
         gui.draggerFloat3("Scale", rockObj.scale, [SCALE_MIN, SCALE_MAX], ["X:", "Y:", "Z:"]);
 
