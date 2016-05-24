@@ -41,7 +41,7 @@ var showTexture = {val: true};
 var ROCK_W = 10;
 var ROCK_H = 10;
 */
-var ROCK_W = 20;
+var ROCK_W = 100;
 var ROCK_H = 10;
 
 
@@ -55,6 +55,9 @@ var camera = createMovableCamera({
 });
 
 var planeGeo;
+
+var workers;
+var NUM_WORKERS = 3;
 
 shell.on("gl-init", function () {
     var gl = shell.gl
@@ -70,32 +73,33 @@ shell.on("gl-init", function () {
 
     var objCount = 0;
 
+    workers = new Array(NUM_WORKERS);
 
-    var worker = Work(require('./worker.js'));
+    for(var workerI = 0; workerI < NUM_WORKERS; ++workerI) {
 
+        workers[workerI] = Work(require('./worker.js'));
 
-    worker.addEventListener('message', function (msg) {
+        workers[workerI].addEventListener('message', function (msg) {
 
-        console.log("main got message ", msg.data);
+          //  console.log("at main got message from worker ", msg.data[0]);
 
-        //++objCount;
+            if (rocks.length >= (ROCK_W * ROCK_H)) {
+                workers[msg.data[0]].terminate();
+                console.log("done working for worker ", msg.data[0]);
+            }
 
-        var rock = msg.data;
-      //  rock.buildMesh(gl);
+            var rock = msg.data[1];
 
-        buildRockMesh(gl, rock);
-        rocks.push(rock);
+            buildRockMesh(gl, rock);
+            rocks.push(rock);
 
-        worker.postMessage("work!");
+            workers[msg.data[0]].postMessage(msg.data[0]);
 
-        if(rocks.length > ROCK_W*ROCK_H) {
-            worker.terminate();
-            console.log("done working");
-        }
-    });
+        });
 
-    worker.postMessage("work!");
-    console.log("DONE: ", objCount);
+        workers[workerI].postMessage(workerI);
+
+    }
 
 
 

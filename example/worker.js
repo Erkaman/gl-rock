@@ -14,7 +14,7 @@ module.exports = function (self) {
     self.addEventListener('message',function (msg){
 
 
-        console.log(" worker got message ", msg.data);
+     //   console.log("at worker, got message to worker ", msg.data);
 
         if(count > 4) {
 
@@ -39,7 +39,7 @@ module.exports = function (self) {
 
         rockObj.varyStrength = 1.0;
 
-        self.postMessage(rock);
+        self.postMessage([msg.data, rock]);
     });
 };
 

@@ -109,7 +109,7 @@ vec3 samplePalette(float t) {
 }
 
 void main() {
-/*
+
     float uColorNoiseScale = 10.0;
     int uColorNoiseOctaves = 8;
     float uColorNoisePersistence= 0.8;
@@ -130,6 +130,6 @@ void main() {
 
     gl_FragColor =  lighting(diff);
 
-   if(!uShowTexture)*/
+   if(!uShowTexture)
         gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }
