@@ -14,10 +14,9 @@ function RockObj() {
     this.scrapeMinDist = {val: 0.8};
     this.scrapeStrength = {val: 0.2};
     this.scrapeRadius = {val: 0.3};
-    this.aColor = [0.43, 0.32, 0.2];
-    this.bColor = [0.50, 0.40, 0.30];
-    this.cColor = [0.60, 0.45, 0.37];
-    this.dColor = [0.71, 0.66, 0.59];
+    this.aColor = [0.50, 0.40, 0.30];
+    this.bColor = [0.60, 0.45, 0.37];
+    this.cColor = [0.71, 0.66, 0.59];
 
     this.colorNoiseStrength = {val: 1.0};
     this.cracksNoiseStrength = {val: 0.3};
@@ -148,7 +147,6 @@ RockObj.prototype.randomizeColor = function () {
     this.aColor = randomArray(0, 1).oned(3);
     this.bColor = randomArray(0, 1).oned(3);
     this.cColor = randomArray(0, 1).oned(3);
-    this.dColor = randomArray(0, 1).oned(3);
 }
 
 
@@ -166,7 +164,6 @@ RockObj.prototype.varyColor = function () {
     this.varyColorHelper(this.aColor);
     this.varyColorHelper(this.bColor);
     this.varyColorHelper(this.cColor);
-    this.varyColorHelper(this.dColor);
 }
 
 

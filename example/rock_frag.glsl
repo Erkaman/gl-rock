@@ -21,9 +21,9 @@ uniform float uColorNoiseStrength;
 uniform float uCracksNoiseStrength;
 
 
+uniform vec3 uAColor;
 uniform vec3 uBColor;
 uniform vec3 uCColor;
-uniform vec3 uDColor;
 
 
 
@@ -100,16 +100,16 @@ vec3 samplePalette(float t) {
     if(t < 0.25) {
         return vec3(0.0);
     } else if(t > 0.25 && t <0.5) {
-        return mix(uBColor, uCColor,  (t-0.25) /0.25 );
+        return mix(uAColor, uBColor,  (t-0.25) /0.25 );
     }else{
-        return mix(uCColor, uDColor,  (t-0.5) /0.5 );
+        return mix(uBColor, uCColor,  (t-0.5) /0.5 );
 
     }
 
 }
 
 void main() {
-/*
+
     float uColorNoiseScale = 10.0;
     int uColorNoiseOctaves = 8;
     float uColorNoisePersistence= 0.8;
@@ -130,6 +130,6 @@ void main() {
 
     gl_FragColor =  lighting(diff);
 
-   if(!uShowTexture)*/
+   if(!uShowTexture)
         gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);
 }

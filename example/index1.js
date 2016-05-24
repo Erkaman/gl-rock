@@ -140,7 +140,6 @@ shell.on("gl-render", function (t) {
         gui.draggerRgb("aColor", rockObj.aColor);
         gui.draggerRgb("bColor", rockObj.bColor);
         gui.draggerRgb("cColor", rockObj.cColor);
-        gui.draggerRgb("dColor", rockObj.dColor);
 
         if (gui.button("Randomize")) { rockObj.randomizeColor();newRock(gl);  }
         gui.sameLine();

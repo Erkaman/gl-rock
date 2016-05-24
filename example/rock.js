@@ -24,21 +24,20 @@ function Rock(rockObj) {
     rock.aColor= rockObj.aColor;
     rock.bColor= rockObj.bColor;
     rock.cColor= rockObj.cColor;
-    rock.dColor= rockObj.dColor;
 
 //    console.log("radius: ", rock.scrapeStrength);
 
     rock.scale= rockObj.scale;
 
-    rock.colorNoiseStrength = rockObj.colorNoiseStrength.val;
-    rock.cracksNoiseStrength = rockObj.cracksNoiseStrength.val;
+    rock.colorNoiseStrength = rockObj.colorNoiseStrength;
+    rock.cracksNoiseStrength = rockObj.cracksNoiseStrength;
 
 
     var simple = [
         [0.0, [0,0,0] ],
-        [0.25,rock.bColor],
-        [0.5, rock.cColor],
-        [1.0, rock.dColor],
+        [0.25,rock.aColor],
+        [0.5, rock.bColor],
+        [1.0, rock.cColor],
     ];
 
 
@@ -176,12 +175,12 @@ function isRockMeshBuilt(rock) {
     shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
     shader.uniforms.uSeed = rock.seed;
 
+    shader.uniforms.uAColor = rock.aColor;
     shader.uniforms.uBColor = rock.bColor;
     shader.uniforms.uCColor = rock.cColor;
-    shader.uniforms.uDColor = rock.dColor;
 
-    shader.uniforms.uColorNoiseStrength = rock.colorNoiseStrength;
-    shader.uniforms.uCracksNoiseStrength = rock.cracksNoiseStrength;
+    shader.uniforms.uColorNoiseStrength = rock.colorNoiseStrength.val;
+    shader.uniforms.uCracksNoiseStrength = rock.cracksNoiseStrength.val;
 
 
 
