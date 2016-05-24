@@ -16,7 +16,6 @@ uniform float uAngleDiff;
 uniform bool uShowTexture;
 uniform float uSeed;
 
-
 uniform float uColorNoiseStrength;
 uniform float uCracksNoiseStrength;
 
@@ -25,15 +24,7 @@ uniform vec3 uAColor;
 uniform vec3 uBColor;
 uniform vec3 uCColor;
 
-
-
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
-
-#pragma glslify: worley3D = require(glsl-worley/worley3D.glsl)
-#pragma glslify: worley2x2x2 = require(glsl-worley/worley2x2x2.glsl)
-#pragma glslify: worley2D = require(glsl-worley/worley2D.glsl)
-#pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
-
 
 float noise(vec3 s) {
     return snoise3(s) * 0.5 + 0.5;
