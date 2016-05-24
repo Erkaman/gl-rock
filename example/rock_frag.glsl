@@ -1,5 +1,3 @@
-#extension GL_OES_standard_derivatives : enable
-
 precision mediump float;
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -16,24 +14,14 @@ uniform float uAngleDiff;
 uniform bool uShowTexture;
 uniform float uSeed;
 
-
 uniform float uColorNoiseStrength;
 uniform float uCracksNoiseStrength;
-
 
 uniform vec3 uAColor;
 uniform vec3 uBColor;
 uniform vec3 uCColor;
 
-
-
 #pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
-
-#pragma glslify: worley3D = require(glsl-worley/worley3D.glsl)
-#pragma glslify: worley2x2x2 = require(glsl-worley/worley2x2x2.glsl)
-#pragma glslify: worley2D = require(glsl-worley/worley2D.glsl)
-#pragma glslify: worley2x2 = require(glsl-worley/worley2x2.glsl)
-
 
 float noise(vec3 s) {
     return snoise3(s) * 0.5 + 0.5;
@@ -59,6 +47,9 @@ float fbm( vec3 p, int n, float persistence) {
     return v / total;
 }
 
+/*
+ridged fractal.
+*/
 float ridge( vec3 p, int n, float persistence) {
 
     float v = 0.0;
@@ -103,9 +94,7 @@ vec3 samplePalette(float t) {
         return mix(uAColor, uBColor,  (t-0.25) /0.25 );
     }else{
         return mix(uBColor, uCColor,  (t-0.5) /0.5 );
-
     }
-
 }
 
 void main() {
@@ -119,6 +108,7 @@ void main() {
     vec3 s = vPosition;
 
     float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);
+    // add rock color.
     diff = uColorNoiseStrength *  samplePalette(t);
 
     float t1 = ridge(vec3(1.0)*s, 8, 0.8);
@@ -128,6 +118,7 @@ void main() {
     diff += uCracksNoiseStrength*t1;
     diff -= uCracksNoiseStrength*t2;
 
+    // finally, do lighting.
     gl_FragColor =  lighting(diff);
 
    if(!uShowTexture)

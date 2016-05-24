@@ -1,9 +1,9 @@
 {
   "name": "gl-rock",
   "version": "1.0.0",
-  "description": "Procedual rock generation in OpenGL",
+  "description": "Procedual rock generation in WebGL",
   "scripts": {
-    "start": "budo --verbose example/index1.js -t glslify --live --open",
+    "start": "budo --verbose example/index2.js -t glslify --live --open",
     "test": "standard"
   },
   "keywords": [],
@@ -11,7 +11,6 @@
   "license": "MIT",
   "devDependencies": {
     "array-shuffle": "^1.0.0",
-    "bunny": "^1.0.1",
     "es6-set": "^0.1.4",
     "geo-3d-transform-mat4": "^1.0.0",
     "gl-camera-pos-from-view-matrix": "^1.0.1",
@@ -21,25 +20,19 @@
     "gl-now": "^1.4.0",
     "gl-shader": "^4.2.0",
     "gl-vec3": "^1.0.3",
-    "glsl-worley": "^1.0.0",
     "glslify": "^5.0.2",
-    "install": "^0.7.3",
     "normals": "^1.0.1",
     "orbit-camera": "^1.0.0",
     "pnp-gui": "0.0.3",
-    "primitive-icosphere": "^1.0.2",
     "primitive-plane": "^1.0.1",
     "random-array": "0.0.2",
     "random-item": "^1.0.0",
     "seed-random": "^2.2.0",
     "tooloud": "^1.0.0",
-    "vertices-bounding-box": "^1.0.0",
-    "web-worker": "^0.1.6",
     "webworkify": "^1.2.1",
-    "workerjs": "^0.1.1"
+    "glsl-noise": "0.0.0"
   },
   "dependencies": {
-    "glsl-noise": "0.0.0"
   },
   "directories": {
     "example": "example"

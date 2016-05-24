@@ -4,6 +4,9 @@
 
 var randomArray = require('random-array');
 
+/*
+RockObj contains all the parameters that are used when generating a rock.
+ */
 
 function RockObj() {
 
@@ -23,7 +26,6 @@ function RockObj() {
     this.scale = [1.0, 1.0, 1.0];
     
     this.varyStrength = 1.0;
-
 }
 
 
@@ -61,17 +63,14 @@ SCALE_MIN = +1.0;
 SCALE_MAX = +2.0;
 SCALE_VARY = +0.1;
 
-COLOR_VARY = 0.06;
-
+COLOR_VARY = 0.04;
 
 RockObj.prototype.randomizeNoise = function () {
-
     this.colorNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
     this.cracksNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
 }
 
 RockObj.prototype.varyParameter = function varyParameter(param, variance, min, max) {
-
     param.val += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
     if (param.val > max) param.val = max;
     if (param.val < min) param.val = min;
@@ -79,7 +78,6 @@ RockObj.prototype.varyParameter = function varyParameter(param, variance, min, m
 }
 
 RockObj.prototype.varyArray = function (arr, i, variance, min, max) {
-
     arr[i] += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
     if (arr[i] > max) arr[i] = max;
     if (arr[i] < min) arr[i] = min;
@@ -104,13 +102,10 @@ RockObj.prototype.randomizeMesh = function () {
 
 RockObj.prototype.varyMesh = function () {
 
-
     this.varyParameter(this.meshNoiseScale,
         MESH_NOISE_SCALE_VARY, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
-
     this.varyParameter(this.meshNoiseStrength,
         MESH_NOISE_STRENGTH_VARY, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
-
 
     this.varyParameter(this.scrapeCount, SCRAPE_COUNT_VARY, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
 
@@ -120,15 +115,7 @@ RockObj.prototype.varyMesh = function () {
     this.varyParameter(this.scrapeRadius, SCRAPE_RADIUS_VARY, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
 
-    //
-    // vary scale.
-
     var scale = this.scale;
-
-    var VARY = SCALE_VARY;
-
-
-
     this.varyArray(scale, 0, SCALE_VARY, SCALE_MIN, SCALE_MAX);
     this.varyArray(scale, 1, SCALE_VARY, SCALE_MIN, SCALE_MAX);
     this.varyArray(scale, 2, SCALE_VARY, SCALE_MIN, SCALE_MAX);
@@ -136,7 +123,6 @@ RockObj.prototype.varyMesh = function () {
 
 
 RockObj.prototype.varyNoise = function () {
-
     this.varyParameter(this.colorNoiseStrength,
         NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
     this.varyParameter(this.cracksNoiseStrength,
@@ -149,12 +135,7 @@ RockObj.prototype.randomizeColor = function () {
     this.cColor = randomArray(0, 1).oned(3);
 }
 
-
-
 RockObj.prototype.varyColorHelper = function (color) {
-
-    var VARY = COLOR_VARY;
-
     this.varyArray(color, 0, COLOR_VARY, 0.0, 1.0);
     this.varyArray(color, 1, COLOR_VARY, 0.0, 1.0);
     this.varyArray(color, 2, COLOR_VARY, 0.0, 1.0);

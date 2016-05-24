@@ -9,23 +9,26 @@ var shell = require("gl-now")();
 var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var randomItem = require('random-item');
-var RockObj = require('./rock_obj.js');
 var createPlane = require('primitive-plane');
+
+var RockObj = require('./rock_obj.js');
 
 var createRock = require('./rock.js').createRock;
 var buildRockMesh = require('./rock.js').buildRockMesh;
 var drawRock = require('./rock.js').drawRock;
 
-
-var demo1Shader, bunnyGeo, sphereGeo;
+var rockShader;
+var rock;
 
 var camera = createOrbitCamera([0, -2.0, 0], [0, 0, 0], [0, 1, 0]);
 
 var mouseLeftDownPrev = false;
 
-var rock;
-
 var bg = [0.6, 0.7, 1.0]; // clear color.
+
+/*
+These can be manipulated through the GUI.
+ */
 
 var editMode = {val: 0};
 var showTexture = {val: true};
@@ -33,28 +36,23 @@ var showTexture = {val: true};
 var rockObj = new RockObj();
 
 function newRock(gl) {
-
     rock = createRock(rockObj );
-
     buildRockMesh(gl, rock);
 }
 
 shell.on("gl-init", function () {
-    var gl = shell.gl
+    var gl = shell.gl;
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK)
+    gl.cullFace(gl.BACK);
     
     gui = new createGui(gl);
     gui.windowSizes = [300, 530];
 
- //  for(var i = 0; i < 1000; ++i)
-        newRock(gl);
+    newRock(gl);
 
-    
-    
-    demo1Shader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
+    rockShader = glShader(gl, glslify("./rock_vert.glsl"), glslify("./rock_frag.glsl"));
 
     camera.rotate([0,0], [0,0] );
 });
@@ -78,12 +76,9 @@ shell.on("gl-render", function (t) {
     var scratchVec = vec3.create();
 
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
-
-
-    demo1Shader.bind();
-
-
-    drawRock(demo1Shader, view, projection, showTexture.val, [0.0, 0.0, 0.0], rock);
+    
+    rockShader.bind();
+    drawRock(rockShader, view, projection, showTexture.val, [0.0, 0.0, 0.0], rock);
 
     var pressed = shell.wasDown("mouse-left");
     var io = {
@@ -104,8 +99,6 @@ shell.on("gl-render", function (t) {
     gui.radioButton("Texture", editMode, 1);
 
     gui.separator();
-
-
 
     if(editMode.val == 0) {
         gui.textLine("Mesh");
@@ -162,7 +155,6 @@ shell.on("gl-render", function (t) {
 
     gui.separator();
 
-
     if (gui.button("Randomize")) { rockObj.randomizeNoise();rockObj.randomizeColor(); rockObj.randomizeMesh();newRock(gl);  }
     gui.sameLine();
     if (gui.button("Vary")) { rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh(); newRock(gl);  }
@@ -187,13 +179,9 @@ var pDownPrev = false;
 shell.on("tick", function () {
     var gl = shell.gl
 
-
     var pressed = shell.wasDown("P");
-
     if(pressed && !pDownPrev) {
-
         newRock(gl);
-        console.log("PP")
     }
     pDownPrev = pressed;
     

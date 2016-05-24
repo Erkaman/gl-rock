@@ -13,17 +13,17 @@ module.exports = function (self) {
 
     self.addEventListener('message',function (msg){
 
-
-     //   console.log("at worker, got message to worker ", msg.data);
-
         if(count > 4) {
-
+            
             rockObj = new RockObj();
-            rockObj.varyStrength = 1.5;
+            rockObj.varyStrength = 1.0;
 
-            rockObj.varyArray(rockObj.scale, 0, 0.4, SCALE_MIN, SCALE_MAX);
-            rockObj.varyArray(rockObj.scale, 1, 0.4, SCALE_MIN, SCALE_MAX);
-            rockObj.varyArray(rockObj.scale, 2, 0.4, SCALE_MIN, SCALE_MAX);
+            // vary scale some more:
+            var V = 0.9;
+
+            rockObj.varyArray(rockObj.scale, 0, V, SCALE_MIN, SCALE_MAX);
+            rockObj.varyArray(rockObj.scale, 1, V, SCALE_MIN, SCALE_MAX);
+            rockObj.varyArray(rockObj.scale, 2, V, SCALE_MIN, SCALE_MAX);
 
             count = 0;
         }
@@ -42,14 +42,3 @@ module.exports = function (self) {
         self.postMessage([msg.data, rock]);
     });
 };
-
-/*
-self.onmessage = function (msg) {
-    console.log(" worker got message ", msg.data);
-    self.postMessage("done!");
-
-};
-
-function fibo (n) {
-    return n > 1 ? fibo(n - 1) + fibo(n - 2) : 1;
-}*/
