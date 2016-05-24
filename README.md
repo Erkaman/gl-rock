@@ -8,6 +8,11 @@ In this project, a simple technique for procedurally generating rocks is showcas
 
 Two demos of the technique are provided.
 
+* [Rock Editor](http://erkaman.github.io/gl-rock/example/index1.html)
+* [1000 Rocks](http://erkaman.github.io/gl-rock/example/index2.html)
+
+**Note that the second demo will be very taxing on lower-end GPUs!**
+
 ## Explanation.
 
 In this section, our technique for procedurally generating rocks is outlined.
