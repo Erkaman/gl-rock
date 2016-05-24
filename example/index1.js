@@ -177,6 +177,7 @@ shell.on("gl-render", function (t) {
     if (gui.button("Update Rock")) {
         newRock(gl);
     }
+    gui.sameLine(); gui.textLine("Or press P");
 
     gui.end(gl, canvas.width, canvas.height);
 });
