@@ -13,6 +13,29 @@ Two demos of the technique are provided.
 
 **Note that the second demo will be very taxing on lower-end GPUs!**
 
+### 1000 Rocks
+
+The camera in the demo is controlled as follows:
+
+* Keys `W` and `S` are used to walk forward and backward.
+* Keys `A` and `D` are used to stride left and right.
+* Keys `O` and `L` are used to fly up and down.
+* Hold down the key `M` to speed up the camera.
+* Hold down the left mouse button and move the mouse to turn the camera.
+
+
+### Rock Editor
+
+If you are modifying the mesh parameters(The "edit mode" is "mesh"), then the mesh will not update real-time. You must click the button "Update Rock", or the keyboard key "P", in order to update the rock. 
+
+Next, we explain some parameters of the rock editor.
+
+* TODO
+
+
+
+
+
 ## Explanation.
 
 In this section, our technique for procedurally generating rocks is outlined.
