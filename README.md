@@ -11,7 +11,7 @@ Two demos of the technique are provided.
 * [Rock Editor](http://erkaman.github.io/gl-rock/example/index1.html)
 * [1000 Rocks](http://erkaman.github.io/gl-rock/example/index2.html)
 
-**Note that the second demo will be very taxing on lower-end GPUs!**
+**Note that the second demo will be very taxing on lower-end GPUs!** A [Video](https://www.youtube.com/watch?v=PX9lU_IqcT4) is provided in case your GPU is too weak.
 
 ### 1000 Rocks
 
