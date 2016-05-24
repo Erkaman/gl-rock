@@ -137,9 +137,8 @@ shell.on("gl-render", function (t) {
         var translation = [(w) * ROCK_SPACING, 0.0, (h - ROCK_H / 2.0) * ROCK_SPACING];
         
         var rock = rocks[w * ROCK_H +h];
-
-
-
+        
+        // build rock mesh on the fly. 
         if(!isRockMeshBuilt(rock)) {
             buildRockMesh(gl, rock);
         }
