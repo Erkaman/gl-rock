@@ -61,7 +61,7 @@ SCALE_MIN = +1.0;
 SCALE_MAX = +2.0;
 SCALE_VARY = +0.1;
 
-COLOR_VARY = 0.03;
+COLOR_VARY = 0.06;
 
 
 RockObj.prototype.randomizeNoise = function () {
