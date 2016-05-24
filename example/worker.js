@@ -19,7 +19,7 @@ module.exports = function (self) {
             rockObj.varyStrength = 1.0;
 
             // vary scale some more:
-            var V = 0.8;
+            var V = 0.9;
 
             rockObj.varyArray(rockObj.scale, 0, V, SCALE_MIN, SCALE_MAX);
             rockObj.varyArray(rockObj.scale, 1, V, SCALE_MIN, SCALE_MAX);
