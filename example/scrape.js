@@ -95,10 +95,11 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, stre
     var stack = [];
     stack.push(positionIndex);
 
-    var count = 0;
 
-    var borderVertices = [];
-
+    /*
+     We use a simple flood-fill algorithm to make sure that we scrape all vertices around the center.
+     This will be fast, since all vertices have knowledge about their neighbours.
+     */
     while(stack.length > 0) {
 
         var topIndex = stack.pop();
@@ -115,7 +116,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, stre
 
         var projectedP = project(n, r0, p);
 
-        ++count;
         if(vec3.squaredDistance(projectedP, r0) < radius) {
 
             positions[topIndex] = projectedP;
