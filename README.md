@@ -91,6 +91,7 @@ budo --verbose example/index2.js -t glslify --live --open
 ## TODO
 
 * It would be nice if the generated rocks could be exported to some external format such as `.ply` or `.obj`.
+* Add Ambient Occlusion.
 
 
 
