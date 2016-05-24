@@ -10,23 +10,26 @@ var shell = require("gl-now")();
 var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var randomItem = require('random-item');
-var RockObj = require('./rock_obj.js');
 var createPlane = require('primitive-plane');
+
+var RockObj = require('./rock_obj.js');
 
 var createRock = require('./rock.js').createRock;
 var buildRockMesh = require('./rock.js').buildRockMesh;
 var drawRock = require('./rock.js').drawRock;
 
-
-var demo1Shader, bunnyGeo, sphereGeo;
+var rockShader;
+var rock;
 
 var camera = createOrbitCamera([0, -2.0, 0], [0, 0, 0], [0, 1, 0]);
 
 var mouseLeftDownPrev = false;
 
-var rock;
-
 var bg = [0.6, 0.7, 1.0]; // clear color.
+
+/*
+These can be manipulated through the GUI.
+ */
 
 var editMode = {val: 0};
 var showTexture = {val: true};
@@ -34,28 +37,23 @@ var showTexture = {val: true};
 var rockObj = new RockObj();
 
 function newRock(gl) {
-
     rock = createRock(rockObj );
-
     buildRockMesh(gl, rock);
 }
 
 shell.on("gl-init", function () {
-    var gl = shell.gl
+    var gl = shell.gl;
 
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
-    gl.cullFace(gl.BACK)
+    gl.cullFace(gl.BACK);
     
     gui = new createGui(gl);
     gui.windowSizes = [300, 530];
 
- //  for(var i = 0; i < 1000; ++i)
-        newRock(gl);
+    newRock(gl);
 
-    
-    
-    demo1Shader = glShader(gl, "\nprecision mediump float;\n#define GLSLIFY 1\nattribute vec3 aPosition;\nattribute vec3 aNormal;\n\nvarying vec3 vNormal;\nvarying vec3 vPosition;\n\nuniform mat4 uProjection;\nuniform mat4 uView;\nuniform mat4 uModel;\n\nvoid main() {\n\n    vNormal = aNormal;\n    vPosition = aPosition;\n    gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);\n}\n", "#extension GL_OES_standard_derivatives : enable\n\nprecision mediump float;\n#define GLSLIFY 1\nvarying vec3 vNormal;\nvarying vec3 vPosition;\n\nuniform vec3 uDiffuseColor;\nuniform vec3 uAmbientLight;\nuniform vec3 uLightColor;\nuniform vec3 uLightDir;\nuniform vec3 uEyePos;\nuniform mat4 uView;\nuniform float uSpecularPower;\nuniform float uHasSpecular;\nuniform float uAngleDiff;\nuniform bool uShowTexture;\nuniform float uSeed;\n\nuniform float uColorNoiseStrength;\nuniform float uCracksNoiseStrength;\n\nuniform vec3 uAColor;\nuniform vec3 uBColor;\nuniform vec3 uCColor;\n\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute_0(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute_0( permute_0( permute_0(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\n// Permutation polynomial: (34x^2 + x) mod 289\nvec3 permute_2(vec3 x) {\n  return mod((34.0 * x + 1.0) * x, 289.0);\n}\n\nvec3 dist_1(vec3 x, vec3 y, vec3 z,  bool manhattanDistance) {\n  return manhattanDistance ?  abs(x) + abs(y) + abs(z) :  (x * x + y * y + z * z);\n}\n\nvec2 worley_1(vec3 P, float jitter, bool manhattanDistance) {\nfloat K = 0.142857142857; // 1/7\nfloat Ko = 0.428571428571; // 1/2-K/2\nfloat  K2 = 0.020408163265306; // 1/(7*7)\nfloat Kz = 0.166666666667; // 1/6\nfloat Kzo = 0.416666666667; // 1/2-1/6*2\n\n\tvec3 Pi = mod(floor(P), 289.0);\n \tvec3 Pf = fract(P) - 0.5;\n\n\tvec3 Pfx = Pf.x + vec3(1.0, 0.0, -1.0);\n\tvec3 Pfy = Pf.y + vec3(1.0, 0.0, -1.0);\n\tvec3 Pfz = Pf.z + vec3(1.0, 0.0, -1.0);\n\n\tvec3 p = permute_2(Pi.x + vec3(-1.0, 0.0, 1.0));\n\tvec3 p1 = permute_2(p + Pi.y - 1.0);\n\tvec3 p2 = permute_2(p + Pi.y);\n\tvec3 p3 = permute_2(p + Pi.y + 1.0);\n\n\tvec3 p11 = permute_2(p1 + Pi.z - 1.0);\n\tvec3 p12 = permute_2(p1 + Pi.z);\n\tvec3 p13 = permute_2(p1 + Pi.z + 1.0);\n\n\tvec3 p21 = permute_2(p2 + Pi.z - 1.0);\n\tvec3 p22 = permute_2(p2 + Pi.z);\n\tvec3 p23 = permute_2(p2 + Pi.z + 1.0);\n\n\tvec3 p31 = permute_2(p3 + Pi.z - 1.0);\n\tvec3 p32 = permute_2(p3 + Pi.z);\n\tvec3 p33 = permute_2(p3 + Pi.z + 1.0);\n\n\tvec3 ox11 = fract(p11*K) - Ko;\n\tvec3 oy11 = mod(floor(p11*K), 7.0)*K - Ko;\n\tvec3 oz11 = floor(p11*K2)*Kz - Kzo; // p11 < 289 guaranteed\n\n\tvec3 ox12 = fract(p12*K) - Ko;\n\tvec3 oy12 = mod(floor(p12*K), 7.0)*K - Ko;\n\tvec3 oz12 = floor(p12*K2)*Kz - Kzo;\n\n\tvec3 ox13 = fract(p13*K) - Ko;\n\tvec3 oy13 = mod(floor(p13*K), 7.0)*K - Ko;\n\tvec3 oz13 = floor(p13*K2)*Kz - Kzo;\n\n\tvec3 ox21 = fract(p21*K) - Ko;\n\tvec3 oy21 = mod(floor(p21*K), 7.0)*K - Ko;\n\tvec3 oz21 = floor(p21*K2)*Kz - Kzo;\n\n\tvec3 ox22 = fract(p22*K) - Ko;\n\tvec3 oy22 = mod(floor(p22*K), 7.0)*K - Ko;\n\tvec3 oz22 = floor(p22*K2)*Kz - Kzo;\n\n\tvec3 ox23 = fract(p23*K) - Ko;\n\tvec3 oy23 = mod(floor(p23*K), 7.0)*K - Ko;\n\tvec3 oz23 = floor(p23*K2)*Kz - Kzo;\n\n\tvec3 ox31 = fract(p31*K) - Ko;\n\tvec3 oy31 = mod(floor(p31*K), 7.0)*K - Ko;\n\tvec3 oz31 = floor(p31*K2)*Kz - Kzo;\n\n\tvec3 ox32 = fract(p32*K) - Ko;\n\tvec3 oy32 = mod(floor(p32*K), 7.0)*K - Ko;\n\tvec3 oz32 = floor(p32*K2)*Kz - Kzo;\n\n\tvec3 ox33 = fract(p33*K) - Ko;\n\tvec3 oy33 = mod(floor(p33*K), 7.0)*K - Ko;\n\tvec3 oz33 = floor(p33*K2)*Kz - Kzo;\n\n\tvec3 dx11 = Pfx + jitter*ox11;\n\tvec3 dy11 = Pfy.x + jitter*oy11;\n\tvec3 dz11 = Pfz.x + jitter*oz11;\n\n\tvec3 dx12 = Pfx + jitter*ox12;\n\tvec3 dy12 = Pfy.x + jitter*oy12;\n\tvec3 dz12 = Pfz.y + jitter*oz12;\n\n\tvec3 dx13 = Pfx + jitter*ox13;\n\tvec3 dy13 = Pfy.x + jitter*oy13;\n\tvec3 dz13 = Pfz.z + jitter*oz13;\n\n\tvec3 dx21 = Pfx + jitter*ox21;\n\tvec3 dy21 = Pfy.y + jitter*oy21;\n\tvec3 dz21 = Pfz.x + jitter*oz21;\n\n\tvec3 dx22 = Pfx + jitter*ox22;\n\tvec3 dy22 = Pfy.y + jitter*oy22;\n\tvec3 dz22 = Pfz.y + jitter*oz22;\n\n\tvec3 dx23 = Pfx + jitter*ox23;\n\tvec3 dy23 = Pfy.y + jitter*oy23;\n\tvec3 dz23 = Pfz.z + jitter*oz23;\n\n\tvec3 dx31 = Pfx + jitter*ox31;\n\tvec3 dy31 = Pfy.z + jitter*oy31;\n\tvec3 dz31 = Pfz.x + jitter*oz31;\n\n\tvec3 dx32 = Pfx + jitter*ox32;\n\tvec3 dy32 = Pfy.z + jitter*oy32;\n\tvec3 dz32 = Pfz.y + jitter*oz32;\n\n\tvec3 dx33 = Pfx + jitter*ox33;\n\tvec3 dy33 = Pfy.z + jitter*oy33;\n\tvec3 dz33 = Pfz.z + jitter*oz33;\n\n\tvec3 d11 = dist_1(dx11, dy11, dz11, manhattanDistance);\n\tvec3 d12 =dist_1(dx12, dy12, dz12, manhattanDistance);\n\tvec3 d13 = dist_1(dx13, dy13, dz13, manhattanDistance);\n\tvec3 d21 = dist_1(dx21, dy21, dz21, manhattanDistance);\n\tvec3 d22 = dist_1(dx22, dy22, dz22, manhattanDistance);\n\tvec3 d23 = dist_1(dx23, dy23, dz23, manhattanDistance);\n\tvec3 d31 = dist_1(dx31, dy31, dz31, manhattanDistance);\n\tvec3 d32 = dist_1(dx32, dy32, dz32, manhattanDistance);\n\tvec3 d33 = dist_1(dx33, dy33, dz33, manhattanDistance);\n\n\tvec3 d1a = min(d11, d12);\n\td12 = max(d11, d12);\n\td11 = min(d1a, d13); // Smallest now not in d12 or d13\n\td13 = max(d1a, d13);\n\td12 = min(d12, d13); // 2nd smallest now not in d13\n\tvec3 d2a = min(d21, d22);\n\td22 = max(d21, d22);\n\td21 = min(d2a, d23); // Smallest now not in d22 or d23\n\td23 = max(d2a, d23);\n\td22 = min(d22, d23); // 2nd smallest now not in d23\n\tvec3 d3a = min(d31, d32);\n\td32 = max(d31, d32);\n\td31 = min(d3a, d33); // Smallest now not in d32 or d33\n\td33 = max(d3a, d33);\n\td32 = min(d32, d33); // 2nd smallest now not in d33\n\tvec3 da = min(d11, d21);\n\td21 = max(d11, d21);\n\td11 = min(da, d31); // Smallest now in d11\n\td31 = max(da, d31); // 2nd smallest now not in d31\n\td11.xy = (d11.x < d11.y) ? d11.xy : d11.yx;\n\td11.xz = (d11.x < d11.z) ? d11.xz : d11.zx; // d11.x now smallest\n\td12 = min(d12, d21); // 2nd smallest now not in d21\n\td12 = min(d12, d22); // nor in d22\n\td12 = min(d12, d31); // nor in d31\n\td12 = min(d12, d32); // nor in d32\n\td11.yz = min(d11.yz,d12.xy); // nor in d12.yz\n\td11.y = min(d11.y,d12.z); // Only two more to go\n\td11.y = min(d11.y,d11.z); // Done! (Phew!)\n\treturn sqrt(d11.xy); // F1, F2\n\n}\n\n// Permutation polynomial: (34x^2 + x) mod 289\nvec4 permute_4(vec4 x) {\n  return mod((34.0 * x + 1.0) * x, 289.0);\n}\nvec3 permute_4(vec3 x) {\n  return mod((34.0 * x + 1.0) * x, 289.0);\n}\n\nvec4 dist_3(vec4 x, vec4 y, vec4 z,  bool manhattanDistance) {\n  return manhattanDistance ?  abs(x) + abs(y) + abs(z) :  (x * x + y * y + z * z);\n}\n\nvec2 worley_3(vec3 P, float jitter, bool manhattanDistance) {\nfloat K = 0.142857142857; // 1/7\nfloat Ko = 0.428571428571; // 1/2-K/2\nfloat K2 = 0.020408163265306; // 1/(7*7)\nfloat Kz = 0.166666666667; // 1/6\nfloat Kzo = 0.416666666667; // 1/2-1/6*2\n\n\tvec3 Pi = mod(floor(P), 289.0);\n \tvec3 Pf = fract(P);\n\tvec4 Pfx = Pf.x + vec4(0.0, -1.0, 0.0, -1.0);\n\tvec4 Pfy = Pf.y + vec4(0.0, 0.0, -1.0, -1.0);\n\tvec4 p = permute_4(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));\n\tp = permute_4(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));\n\tvec4 p1 = permute_4(p + Pi.z); // z+0\n\tvec4 p2 = permute_4(p + Pi.z + vec4(1.0)); // z+1\n\tvec4 ox1 = fract(p1*K) - Ko;\n\tvec4 oy1 = mod(floor(p1*K), 7.0)*K - Ko;\n\tvec4 oz1 = floor(p1*K2)*Kz - Kzo; // p1 < 289 guaranteed\n\tvec4 ox2 = fract(p2*K) - Ko;\n\tvec4 oy2 = mod(floor(p2*K), 7.0)*K - Ko;\n\tvec4 oz2 = floor(p2*K2)*Kz - Kzo;\n\tvec4 dx1 = Pfx + jitter*ox1;\n\tvec4 dy1 = Pfy + jitter*oy1;\n\tvec4 dz1 = Pf.z + jitter*oz1;\n\tvec4 dx2 = Pfx + jitter*ox2;\n\tvec4 dy2 = Pfy + jitter*oy2;\n\tvec4 dz2 = Pf.z - 1.0 + jitter*oz2;\n\tvec4 d1 = dist_3(dx1, dy1, dz1, manhattanDistance);\n\tvec4 d2 = dist_3(dx2, dy2, dz2, manhattanDistance);\n\n\t// Do it right and sort out both F1 and F2\n\tvec4 d = min(d1,d2); // F1 is now in d\n\td2 = max(d1,d2); // Make sure we keep all candidates for F2\n\td.xy = (d.x < d.y) ? d.xy : d.yx; // Swap smallest to d.x\n\td.xz = (d.x < d.z) ? d.xz : d.zx;\n\td.xw = (d.x < d.w) ? d.xw : d.wx; // F1 is now in d.x\n\td.yzw = min(d.yzw, d2.yzw); // F2 now not in d2.yzw\n\td.y = min(d.y, d.z); // nor in d.z\n\td.y = min(d.y, d.w); // nor in d.w\n\td.y = min(d.y, d2.x); // F2 is now in d.y\n\treturn sqrt(d.xy); // F1 and F2\n\n}\n\n  // Permutation polynomial: (34x^2 + x) mod 289\n  vec3 permute_3(vec3 x) {\n    return mod((34.0 * x + 1.0) * x, 289.0);\n  }\n\nvec3 dist_2(vec3 x, vec3 y,  bool manhattanDistance) {\n  return manhattanDistance ?  abs(x) + abs(y) :  (x * x + y * y);\n}\n\n  vec2 worley_2(vec2 P, float jitter, bool manhattanDistance) {\n  float K= 0.142857142857; // 1/7\n  float Ko= 0.428571428571 ;// 3/7\n  \tvec2 Pi_0 = mod(floor(P), 289.0);\n   \tvec2 Pf = fract(P);\n  \tvec3 oi = vec3(-1.0, 0.0, 1.0);\n  \tvec3 of = vec3(-0.5, 0.5, 1.5);\n  \tvec3 px = permute_3(Pi_0.x + oi);\n  \tvec3 p = permute_3(px.x + Pi_0.y + oi); // p11, p12, p13\n  \tvec3 ox = fract(p*K) - Ko;\n  \tvec3 oy = mod(floor(p*K),7.0)*K - Ko;\n  \tvec3 dx = Pf.x + 0.5 + jitter*ox;\n  \tvec3 dy = Pf.y - of + jitter*oy;\n  \tvec3 d1 = dist_2(dx,dy, manhattanDistance); // d11, d12 and d13, squared\n  \tp = permute_3(px.y + Pi_0.y + oi); // p21, p22, p23\n  \tox = fract(p*K) - Ko;\n  \toy = mod(floor(p*K),7.0)*K - Ko;\n  \tdx = Pf.x - 0.5 + jitter*ox;\n  \tdy = Pf.y - of + jitter*oy;\n  \tvec3 d2 = dist_2(dx,dy, manhattanDistance); // d21, d22 and d23, squared\n  \tp = permute_3(px.z + Pi_0.y + oi); // p31, p32, p33\n  \tox = fract(p*K) - Ko;\n  \toy = mod(floor(p*K),7.0)*K - Ko;\n  \tdx = Pf.x - 1.5 + jitter*ox;\n  \tdy = Pf.y - of + jitter*oy;\n  \tvec3 d3 = dist_2(dx,dy, manhattanDistance); // d31, d32 and d33, squared\n  \t// Sort out the two smallest distances (F1, F2)\n  \tvec3 d1a = min(d1, d2);\n  \td2 = max(d1, d2); // Swap to keep candidates for F2\n  \td2 = min(d2, d3); // neither F1 nor F2 are now in d3\n  \td1 = min(d1a, d2); // F1 is now in d1\n  \td2 = max(d1a, d2); // Swap to keep candidates for F2\n  \td1.xy = (d1.x < d1.y) ? d1.xy : d1.yx; // Swap if smaller\n  \td1.xz = (d1.x < d1.z) ? d1.xz : d1.zx; // F1 is in d1.x\n  \td1.yz = min(d1.yz, d2.yz); // F2 is now not in d2.yz\n  \td1.y = min(d1.y, d1.z); // nor in  d1.z\n  \td1.y = min(d1.y, d2.x); // F2 is in d1.y, we're done.\n  \treturn sqrt(d1.xy);\n  }\n\n// Permutation polynomial: (34x^2 + x) mod 289\nvec4 permute_1(vec4 x) {\n  return mod((34.0 * x + 1.0) * x, 289.0);\n}\n\nvec4 dist_0(vec4 x, vec4 y,  bool manhattanDistance) {\n  return manhattanDistance ?  abs(x) + abs(y) :  (x * x + y * y);\n}\n\n// Cellular noise, returning F1 and F2 in a vec2.\n// Speeded up by using 2x2 search window instead of 3x3,\n// at the expense of some strong pattern artifacts.\n// F2 is often wrong and has sharp discontinuities.\n// If you need a smooth F2, use the slower 3x3 version.\n// F1 is sometimes wrong, too, but OK for most purposes.\nvec2 worley_0(vec2 P, float jitter, bool manhattanDistance) {\nfloat K =  0.142857142857;// 1/7\nfloat K2= 0.0714285714285; // K/2\n\tvec2 Pi = mod(floor(P), 289.0);\n \tvec2 Pf = fract(P);\n\tvec4 Pfx = Pf.x + vec4(-0.5, -1.5, -0.5, -1.5);\n\tvec4 Pfy = Pf.y + vec4(-0.5, -0.5, -1.5, -1.5);\n\tvec4 p = permute_1(Pi.x + vec4(0.0, 1.0, 0.0, 1.0));\n\tp = permute_1(p + Pi.y + vec4(0.0, 0.0, 1.0, 1.0));\n\tvec4 ox = mod(p, 7.0)*K+K2;\n\tvec4 oy = mod(floor(p*K),7.0)*K+K2;\n\tvec4 dx = Pfx + jitter*ox;\n\tvec4 dy = Pfy + jitter*oy;\n\tvec4 d =  dist_0(dx, dy, manhattanDistance); // d11, d12, d21 and d22, squared\n\t// Sort out the two smallest distances\n\n\t// Do it right and find both F1 and F2\n\td.xy = (d.x < d.y) ? d.xy : d.yx; // Swap if smaller\n\td.xz = (d.x < d.z) ? d.xz : d.zx;\n\td.xw = (d.x < d.w) ? d.xw : d.wx;\n\td.y = min(d.y, d.z);\n\td.y = min(d.y, d.w);\n\treturn sqrt(d.xy);\n\n}\n\nfloat noise(vec3 s) {\n    return snoise(s) * 0.5 + 0.5;\n}\n\nfloat fbm( vec3 p, int n, float persistence) {\n\n    float v = 0.0;\n    float total = 0.0;\n    float amplitude = 1.0;\n\n    for(int i = 0 ; i < 10; ++i) {\n        if(i >= n) { break; }\n\n        v += amplitude * noise(p);\n        total += amplitude;\n\n        amplitude  *= persistence;\n        p *= 2.0; // double freq.\n\n    }\n\n    return v / total;\n}\n\nfloat ridge( vec3 p, int n, float persistence) {\n\n    float v = 0.0;\n    float total = 0.0;\n    float amplitude = 1.0;\n\n    for(int i = 0 ; i < 10; ++i) {\n        if(i >= n) { break; }\n\n        float signal = (1.0 - abs(  snoise(p) )  );\n        signal = pow(signal, 8.0);\n\n        v += amplitude * signal;\n        total += amplitude;\n\n        amplitude  *= persistence;\n        p *= 2.0; // double freq.\n\n    }\n    return v / total;\n}\n\nvec4 lighting(vec3 diff) {\n\n     vec3 n = vNormal;\n\n    vec3 l = normalize(uLightDir);\n    vec3 v = normalize(uEyePos - vPosition);\n    vec3 ambient = uAmbientLight * diff;\n    vec3 diffuse = diff * uLightColor * dot(n, l) ;\n    vec3 specular = pow(clamp(dot(normalize(l+v),n),0.0,1.0)  , uSpecularPower) * vec3(1.0,1.0,1.0);\n\n    return vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);\n}\n\nvec3 samplePalette(float t) {\n    if(t < 0.25) {\n        return vec3(0.0);\n    } else if(t > 0.25 && t <0.5) {\n        return mix(uAColor, uBColor,  (t-0.25) /0.25 );\n    }else{\n        return mix(uBColor, uCColor,  (t-0.5) /0.5 );\n\n    }\n\n}\n\nvoid main() {\n\n    float uColorNoiseScale = 10.0;\n    int uColorNoiseOctaves = 8;\n    float uColorNoisePersistence= 0.8;\n\n    vec3 diff = vec3(1.0, 0.0, 0.0);\n\n    vec3 s = vPosition;\n\n    float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);\n    diff = uColorNoiseStrength *  samplePalette(t);\n\n    float t1 = ridge(vec3(1.0)*s, 8, 0.8);\n    float t2 = ridge(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);\n\n    // add cracks.\n    diff += uCracksNoiseStrength*t1;\n    diff -= uCracksNoiseStrength*t2;\n\n    gl_FragColor =  lighting(diff);\n\n   if(!uShowTexture)\n        gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);\n}\n");
+    rockShader = glShader(gl, "\nprecision mediump float;\n#define GLSLIFY 1\nattribute vec3 aPosition;\nattribute vec3 aNormal;\n\nvarying vec3 vNormal;\nvarying vec3 vPosition;\n\nuniform mat4 uProjection;\nuniform mat4 uView;\nuniform mat4 uModel;\n\nvoid main() {\n\n    vNormal = aNormal;\n    vPosition = aPosition;\n    gl_Position = uProjection * uView * uModel * vec4(aPosition, 1.0);\n}\n", "precision mediump float;\n#define GLSLIFY 1\nvarying vec3 vNormal;\nvarying vec3 vPosition;\n\nuniform vec3 uDiffuseColor;\nuniform vec3 uAmbientLight;\nuniform vec3 uLightColor;\nuniform vec3 uLightDir;\nuniform vec3 uEyePos;\nuniform mat4 uView;\nuniform float uSpecularPower;\nuniform float uHasSpecular;\nuniform float uAngleDiff;\nuniform bool uShowTexture;\nuniform float uSeed;\n\nuniform float uColorNoiseStrength;\nuniform float uCracksNoiseStrength;\n\nuniform vec3 uAColor;\nuniform vec3 uBColor;\nuniform vec3 uCColor;\n\n//\n// Description : Array and textureless GLSL 2D/3D/4D simplex\n//               noise functions.\n//      Author : Ian McEwan, Ashima Arts.\n//  Maintainer : ijm\n//     Lastmod : 20110822 (ijm)\n//     License : Copyright (C) 2011 Ashima Arts. All rights reserved.\n//               Distributed under the MIT License. See LICENSE file.\n//               https://github.com/ashima/webgl-noise\n//\n\nvec3 mod289(vec3 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 mod289(vec4 x) {\n  return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\n\nvec4 permute(vec4 x) {\n     return mod289(((x*34.0)+1.0)*x);\n}\n\nvec4 taylorInvSqrt(vec4 r)\n{\n  return 1.79284291400159 - 0.85373472095314 * r;\n}\n\nfloat snoise(vec3 v)\n  {\n  const vec2  C = vec2(1.0/6.0, 1.0/3.0) ;\n  const vec4  D = vec4(0.0, 0.5, 1.0, 2.0);\n\n// First corner\n  vec3 i  = floor(v + dot(v, C.yyy) );\n  vec3 x0 =   v - i + dot(i, C.xxx) ;\n\n// Other corners\n  vec3 g = step(x0.yzx, x0.xyz);\n  vec3 l = 1.0 - g;\n  vec3 i1 = min( g.xyz, l.zxy );\n  vec3 i2 = max( g.xyz, l.zxy );\n\n  //   x0 = x0 - 0.0 + 0.0 * C.xxx;\n  //   x1 = x0 - i1  + 1.0 * C.xxx;\n  //   x2 = x0 - i2  + 2.0 * C.xxx;\n  //   x3 = x0 - 1.0 + 3.0 * C.xxx;\n  vec3 x1 = x0 - i1 + C.xxx;\n  vec3 x2 = x0 - i2 + C.yyy; // 2.0*C.x = 1/3 = C.y\n  vec3 x3 = x0 - D.yyy;      // -1.0+3.0*C.x = -0.5 = -D.y\n\n// Permutations\n  i = mod289(i);\n  vec4 p = permute( permute( permute(\n             i.z + vec4(0.0, i1.z, i2.z, 1.0 ))\n           + i.y + vec4(0.0, i1.y, i2.y, 1.0 ))\n           + i.x + vec4(0.0, i1.x, i2.x, 1.0 ));\n\n// Gradients: 7x7 points over a square, mapped onto an octahedron.\n// The ring size 17*17 = 289 is close to a multiple of 49 (49*6 = 294)\n  float n_ = 0.142857142857; // 1.0/7.0\n  vec3  ns = n_ * D.wyz - D.xzx;\n\n  vec4 j = p - 49.0 * floor(p * ns.z * ns.z);  //  mod(p,7*7)\n\n  vec4 x_ = floor(j * ns.z);\n  vec4 y_ = floor(j - 7.0 * x_ );    // mod(j,N)\n\n  vec4 x = x_ *ns.x + ns.yyyy;\n  vec4 y = y_ *ns.x + ns.yyyy;\n  vec4 h = 1.0 - abs(x) - abs(y);\n\n  vec4 b0 = vec4( x.xy, y.xy );\n  vec4 b1 = vec4( x.zw, y.zw );\n\n  //vec4 s0 = vec4(lessThan(b0,0.0))*2.0 - 1.0;\n  //vec4 s1 = vec4(lessThan(b1,0.0))*2.0 - 1.0;\n  vec4 s0 = floor(b0)*2.0 + 1.0;\n  vec4 s1 = floor(b1)*2.0 + 1.0;\n  vec4 sh = -step(h, vec4(0.0));\n\n  vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy ;\n  vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww ;\n\n  vec3 p0 = vec3(a0.xy,h.x);\n  vec3 p1 = vec3(a0.zw,h.y);\n  vec3 p2 = vec3(a1.xy,h.z);\n  vec3 p3 = vec3(a1.zw,h.w);\n\n//Normalise gradients\n  vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));\n  p0 *= norm.x;\n  p1 *= norm.y;\n  p2 *= norm.z;\n  p3 *= norm.w;\n\n// Mix final noise value\n  vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);\n  m = m * m;\n  return 42.0 * dot( m*m, vec4( dot(p0,x0), dot(p1,x1),\n                                dot(p2,x2), dot(p3,x3) ) );\n  }\n\nfloat noise(vec3 s) {\n    return snoise(s) * 0.5 + 0.5;\n}\n\nfloat fbm( vec3 p, int n, float persistence) {\n\n    float v = 0.0;\n    float total = 0.0;\n    float amplitude = 1.0;\n\n    for(int i = 0 ; i < 10; ++i) {\n        if(i >= n) { break; }\n\n        v += amplitude * noise(p);\n        total += amplitude;\n\n        amplitude  *= persistence;\n        p *= 2.0; // double freq.\n\n    }\n\n    return v / total;\n}\n\n/*\nridged fractal.\n*/\nfloat ridge( vec3 p, int n, float persistence) {\n\n    float v = 0.0;\n    float total = 0.0;\n    float amplitude = 1.0;\n\n    for(int i = 0 ; i < 10; ++i) {\n        if(i >= n) { break; }\n\n        float signal = (1.0 - abs(  snoise(p) )  );\n        signal = pow(signal, 8.0);\n\n        v += amplitude * signal;\n        total += amplitude;\n\n        amplitude  *= persistence;\n        p *= 2.0; // double freq.\n\n    }\n    return v / total;\n}\n\nvec4 lighting(vec3 diff) {\n\n     vec3 n = vNormal;\n\n    vec3 l = normalize(uLightDir);\n    vec3 v = normalize(uEyePos - vPosition);\n    vec3 ambient = uAmbientLight * diff;\n    vec3 diffuse = diff * uLightColor * dot(n, l) ;\n    vec3 specular = pow(clamp(dot(normalize(l+v),n),0.0,1.0)  , uSpecularPower) * vec3(1.0,1.0,1.0);\n\n    return vec4(ambient + diffuse /*+ specular*uHasSpecular*/, 1.0);\n}\n\nvec3 samplePalette(float t) {\n    if(t < 0.25) {\n        return vec3(0.0);\n    } else if(t > 0.25 && t <0.5) {\n        return mix(uAColor, uBColor,  (t-0.25) /0.25 );\n    }else{\n        return mix(uBColor, uCColor,  (t-0.5) /0.5 );\n    }\n}\n\nvoid main() {\n\n    float uColorNoiseScale = 10.0;\n    int uColorNoiseOctaves = 8;\n    float uColorNoisePersistence= 0.8;\n\n    vec3 diff = vec3(1.0, 0.0, 0.0);\n\n    vec3 s = vPosition;\n\n    float t= fbm(vec3(uColorNoiseScale)*(s), uColorNoiseOctaves, uColorNoisePersistence);\n    // add rock color.\n    diff = uColorNoiseStrength *  samplePalette(t);\n\n    float t1 = ridge(vec3(1.0)*s, 8, 0.8);\n    float t2 = ridge(vec3(1.0)*(s+vec3(4343.3)), 8, 0.8);\n\n    // add cracks.\n    diff += uCracksNoiseStrength*t1;\n    diff -= uCracksNoiseStrength*t2;\n\n    // finally, do lighting.\n    gl_FragColor =  lighting(diff);\n\n   if(!uShowTexture)\n        gl_FragColor = vec4(vec3(  abs(vNormal)  ), 1.0);\n}\n");
 
     camera.rotate([0,0], [0,0] );
 });
@@ -79,12 +77,9 @@ shell.on("gl-render", function (t) {
     var scratchVec = vec3.create();
 
     mat4.perspective(projection, Math.PI / 2, canvas.width / canvas.height, 0.1, 10000.0);
-
-
-    demo1Shader.bind();
-
-
-    drawRock(demo1Shader, view, projection, showTexture.val, [0.0, 0.0, 0.0], rock);
+    
+    rockShader.bind();
+    drawRock(rockShader, view, projection, showTexture.val, [0.0, 0.0, 0.0], rock);
 
     var pressed = shell.wasDown("mouse-left");
     var io = {
@@ -105,8 +100,6 @@ shell.on("gl-render", function (t) {
     gui.radioButton("Texture", editMode, 1);
 
     gui.separator();
-
-
 
     if(editMode.val == 0) {
         gui.textLine("Mesh");
@@ -163,7 +156,6 @@ shell.on("gl-render", function (t) {
 
     gui.separator();
 
-
     if (gui.button("Randomize")) { rockObj.randomizeNoise();rockObj.randomizeColor(); rockObj.randomizeMesh();newRock(gl);  }
     gui.sameLine();
     if (gui.button("Vary")) { rockObj.varyNoise();rockObj.varyColor(); rockObj.varyMesh(); newRock(gl);  }
@@ -188,13 +180,9 @@ var pDownPrev = false;
 shell.on("tick", function () {
     var gl = shell.gl
 
-
     var pressed = shell.wasDown("P");
-
     if(pressed && !pDownPrev) {
-
         newRock(gl);
-        console.log("PP")
     }
     pDownPrev = pressed;
     
@@ -214,71 +202,63 @@ shell.on("tick", function () {
 });
 },{"./rock.js":2,"./rock_obj.js":3,"gl-mat4":90,"gl-now":115,"gl-shader":116,"gl-vec3":140,"orbit-camera":180,"pnp-gui":201,"primitive-plane":203,"random-array":204,"random-item":205}],2:[function(require,module,exports){
 var cameraPosFromViewMatrix = require('gl-camera-pos-from-view-matrix');
-var scrape = require('./scrape.js');
 var vec3 = require('gl-vec3');
 var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var seedRandom = require('seed-random');
-var createSphere = require('./sphere.js');
-var tooloud = require ('tooloud');
+var tooloud = require('tooloud');
 var mat4 = require('gl-mat4');
 
-var adjacentVertices = null;
-var adjacentFaces = null;
+var createSphere = require('./sphere.js');
+var scrape = require('./scrape.js');
 
+var adjacentVertices = null;
+
+/*
+Rock Mesh generation code.
+ */
 function Rock(rockObj) {
     var rock = {};
 
     rock.seed = rockObj.seed;
     rock.noiseScale = rockObj.meshNoiseScale.val;
-    rock.noiseStrength= rockObj.meshNoiseStrength.val;
-    rock.scrapeCount= rockObj.scrapeCount.val;
-    rock.scrapeMinDist= rockObj.scrapeMinDist.val;
-    rock.scrapeStrength= rockObj.scrapeStrength.val;
-    rock.scrapeRadius= rockObj.scrapeRadius.val;
-    rock.aColor= rockObj.aColor;
-    rock.bColor= rockObj.bColor;
-    rock.cColor= rockObj.cColor;
-
-//    console.log("radius: ", rock.scrapeStrength);
-
-    rock.scale= rockObj.scale;
-
+    rock.noiseStrength = rockObj.meshNoiseStrength.val;
+    rock.scrapeCount = rockObj.scrapeCount.val;
+    rock.scrapeMinDist = rockObj.scrapeMinDist.val;
+    rock.scrapeStrength = rockObj.scrapeStrength.val;
+    rock.scrapeRadius = rockObj.scrapeRadius.val;
+    rock.aColor = rockObj.aColor;
+    rock.bColor = rockObj.bColor;
+    rock.cColor = rockObj.cColor;
+    rock.scale = rockObj.scale;
     rock.colorNoiseStrength = rockObj.colorNoiseStrength;
     rock.cracksNoiseStrength = rockObj.cracksNoiseStrength;
-
-
-    var simple = [
-        [0.0, [0,0,0] ],
-        [0.25,rock.aColor],
-        [0.5, rock.bColor],
-        [1.0, rock.cColor],
-    ];
-
-
-
+    
     var rand = seedRandom(rock.seed);
 
-    var sphere = createSphere({stacks: 20, slices: 20})
+    var sphere = createSphere({stacks: 20, slices: 20});
 
     var positions = sphere.positions;
     var cells = sphere.cells;
     var normals = sphere.normals;
 
-    if(!adjacentVertices) {
+    if (!adjacentVertices) {
         // OPTIMIZATION: we are always using the same sphere as base for the rock,
         // so we only need to compute the adjacent positions once.
         var rockObj = scrape.getNeighbours(positions, cells);
         var adjacentVertices = rockObj.adjacentVertices;
     }
 
-    // generate positions at which to scrape.
+    /*
+     randomly generate positions at which to scrape.
+      */
     var scrapeIndices = [];
 
     for (var i = 0; i < rock.scrapeCount; ++i) {
 
         var attempts = 0;
 
+        // find random position which is not too close to the other positions.
         while (true) {
 
             var randIndex = Math.floor(positions.length * rand());
@@ -290,7 +270,7 @@ function Rock(rockObj) {
 
                 var q = positions[scrapeIndices[j]];
 
-                if (vec3.distance(p, q) <rock.scrapeMinDist) {
+                if (vec3.distance(p, q) < rock.scrapeMinDist) {
                     tooClose = true;
                     break;
                 }
@@ -298,6 +278,7 @@ function Rock(rockObj) {
             ++attempts;
 
             // if we have done too many attempts, we let it pass regardless.
+            // otherwise, we risk an endless loop. 
             if (tooClose && attempts < 100)
                 continue
             else {
@@ -305,33 +286,32 @@ function Rock(rockObj) {
                 break;
             }
         }
-
-
     }
 
+    // now we scrape at all the selected positions.
     for (var i = 0; i < scrapeIndices.length; ++i) {
         scrape.scrape(
             scrapeIndices[i], positions, cells, normals,
             adjacentVertices, rock.scrapeStrength, rock.scrapeRadius);
-
     }
 
+    /*
+    Finally, we apply a Perlin noise to slighty distort the mesh,
+     and then we scale the mesh.
+     */
     for (var i = 0; i < positions.length; ++i) {
         var p = positions[i];
 
-
         var noise =
-            rock.noiseStrength*tooloud.Perlin.noise(
-                rock.noiseScale*p[0],
-                rock.noiseScale*p[1],
-                rock.noiseScale*p[2] );
-
-
+            rock.noiseStrength * tooloud.Perlin.noise(
+                rock.noiseScale * p[0],
+                rock.noiseScale * p[1],
+                rock.noiseScale * p[2]);
+        
         positions[i][0] += noise;
         positions[i][1] += noise;
         positions[i][2] += noise;
-
-
+        
         positions[i][0] *= rock.scale[0];
         positions[i][1] *= rock.scale[1];
         positions[i][2] *= rock.scale[2];
@@ -339,24 +319,20 @@ function Rock(rockObj) {
 
     // of course, we must recompute the normals.
     var normals = createNormals.vertexNormals(cells, positions);
-
-
+    
     rock.positions = positions;
     rock.normals = normals;
     rock.cells = cells;
-    
+
     return rock;
 
 }
 
-var demo1DiffuseColor = [0.40, 0.40, 0.40];
-var demo1AmbientLight = [0.60, 0.60, 0.60];
-var demo1LightColor = [0.40, 0.40, 0.4];
-var demo1SunDir = [-0.69, 1.33, 0.57];
-var demo1SpecularPower = {val: 12.45};
-var demo1HasSpecular = {val: true};
 
-function buildRockMesh (gl, rock) {
+/*
+Build mesh and upload to OpenGL.
+ */
+function buildRockMesh(gl, rock) {
 
     rock.rockGeo = Geometry(gl)
         .attr('aPosition', rock.positions)
@@ -371,7 +347,19 @@ function isRockMeshBuilt(rock) {
 }
 
 
- function drawRock(shader, view, projection, showTexture, translation, rock) {
+/*
+Render rock.
+ */
+function drawRock(shader, view, projection, showTexture, translation, rock) {
+
+    var diffuseColor = [0.40, 0.40, 0.40];
+    var ambientLight = [0.60, 0.60, 0.60];
+    var lightColor = [0.40, 0.40, 0.4];
+    var sunDir = [-0.69, 1.33, 0.57];
+    var specularPower = {val: 12.45};
+    var hasSpecular = {val: true};
+
+
     var scratchVec = vec3.create();
 
     var model = mat4.create();
@@ -381,13 +369,13 @@ function isRockMeshBuilt(rock) {
     shader.uniforms.uProjection = projection;
     shader.uniforms.uModel = model;
 
-    shader.uniforms.uDiffuseColor = demo1DiffuseColor;
-    shader.uniforms.uAmbientLight = demo1AmbientLight;
-    shader.uniforms.uLightColor = demo1LightColor;
-    shader.uniforms.uLightDir = demo1SunDir;
+    shader.uniforms.uDiffuseColor = diffuseColor;
+    shader.uniforms.uAmbientLight = ambientLight;
+    shader.uniforms.uLightColor = lightColor;
+    shader.uniforms.uLightDir = sunDir;
     shader.uniforms.uEyePos = cameraPosFromViewMatrix(scratchVec, view);
-    shader.uniforms.uSpecularPower = demo1SpecularPower.val;
-    shader.uniforms.uHasSpecular = demo1HasSpecular.val ? 1.0 : 0.0;
+    shader.uniforms.uSpecularPower = specularPower.val;
+    shader.uniforms.uHasSpecular = hasSpecular.val ? 1.0 : 0.0;
     shader.uniforms.uSeed = rock.seed;
 
     shader.uniforms.uAColor = rock.aColor;
@@ -397,17 +385,14 @@ function isRockMeshBuilt(rock) {
     shader.uniforms.uColorNoiseStrength = rock.colorNoiseStrength.val;
     shader.uniforms.uCracksNoiseStrength = rock.cracksNoiseStrength.val;
 
-
-
-
     shader.uniforms.uShowTexture = showTexture;
 
 
     rock.rockGeo.bind(shader);
     rock.rockGeo.draw();
-     rock.rockGeo.unbind();
+    rock.rockGeo.unbind();
 
- }
+}
 
 module.exports.createRock = Rock;
 module.exports.buildRockMesh = buildRockMesh;
@@ -424,6 +409,9 @@ module.exports.isRockMeshBuilt = isRockMeshBuilt;
 
 var randomArray = require('random-array');
 
+/*
+RockObj contains all the parameters that are used when generating a rock.
+ */
 
 function RockObj() {
 
@@ -443,7 +431,6 @@ function RockObj() {
     this.scale = [1.0, 1.0, 1.0];
     
     this.varyStrength = 1.0;
-
 }
 
 
@@ -481,17 +468,14 @@ SCALE_MIN = +1.0;
 SCALE_MAX = +2.0;
 SCALE_VARY = +0.1;
 
-COLOR_VARY = 0.06;
-
+COLOR_VARY = 0.04;
 
 RockObj.prototype.randomizeNoise = function () {
-
     this.colorNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
     this.cracksNoiseStrength.val = randomArray(NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX).oned(1)[0];
 }
 
 RockObj.prototype.varyParameter = function varyParameter(param, variance, min, max) {
-
     param.val += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
     if (param.val > max) param.val = max;
     if (param.val < min) param.val = min;
@@ -499,7 +483,6 @@ RockObj.prototype.varyParameter = function varyParameter(param, variance, min, m
 }
 
 RockObj.prototype.varyArray = function (arr, i, variance, min, max) {
-
     arr[i] += randomArray(-variance*this.varyStrength , +variance*this.varyStrength ).oned(1)[0];
     if (arr[i] > max) arr[i] = max;
     if (arr[i] < min) arr[i] = min;
@@ -524,13 +507,10 @@ RockObj.prototype.randomizeMesh = function () {
 
 RockObj.prototype.varyMesh = function () {
 
-
     this.varyParameter(this.meshNoiseScale,
         MESH_NOISE_SCALE_VARY, MESH_NOISE_SCALE_MIN, MESH_NOISE_SCALE_MAX);
-
     this.varyParameter(this.meshNoiseStrength,
         MESH_NOISE_STRENGTH_VARY, MESH_NOISE_STRENGTH_MIN, MESH_NOISE_STRENGTH_MAX);
-
 
     this.varyParameter(this.scrapeCount, SCRAPE_COUNT_VARY, SCRAPE_COUNT_MIN, SCRAPE_COUNT_MAX);
 
@@ -540,15 +520,7 @@ RockObj.prototype.varyMesh = function () {
     this.varyParameter(this.scrapeRadius, SCRAPE_RADIUS_VARY, SCRAPE_RADIUS_MIN, SCRAPE_RADIUS_MAX);
 
 
-    //
-    // vary scale.
-
     var scale = this.scale;
-
-    var VARY = SCALE_VARY;
-
-
-
     this.varyArray(scale, 0, SCALE_VARY, SCALE_MIN, SCALE_MAX);
     this.varyArray(scale, 1, SCALE_VARY, SCALE_MIN, SCALE_MAX);
     this.varyArray(scale, 2, SCALE_VARY, SCALE_MIN, SCALE_MAX);
@@ -556,7 +528,6 @@ RockObj.prototype.varyMesh = function () {
 
 
 RockObj.prototype.varyNoise = function () {
-
     this.varyParameter(this.colorNoiseStrength,
         NOISE_STRENGTH_VARY, NOISE_STRENGTH_MIN, NOISE_STRENGTH_MAX);
     this.varyParameter(this.cracksNoiseStrength,
@@ -569,12 +540,7 @@ RockObj.prototype.randomizeColor = function () {
     this.cColor = randomArray(0, 1).oned(3);
 }
 
-
-
 RockObj.prototype.varyColorHelper = function (color) {
-
-    var VARY = COLOR_VARY;
-
     this.varyArray(color, 0, COLOR_VARY, 0.0, 1.0);
     this.varyArray(color, 1, COLOR_VARY, 0.0, 1.0);
     this.varyArray(color, 2, COLOR_VARY, 0.0, 1.0);
@@ -686,10 +652,11 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, stre
     var stack = [];
     stack.push(positionIndex);
 
-    var count = 0;
 
-    var borderVertices = [];
-
+    /*
+     We use a simple flood-fill algorithm to make sure that we scrape all vertices around the center.
+     This will be fast, since all vertices have knowledge about their neighbours.
+     */
     while(stack.length > 0) {
 
         var topIndex = stack.pop();
@@ -706,7 +673,6 @@ function scrape(positionIndex, positions, cells, normals, adjacentVertices, stre
 
         var projectedP = project(n, r0, p);
 
-        ++count;
         if(vec3.squaredDistance(projectedP, r0) < radius) {
 
             positions[topIndex] = projectedP;
