@@ -142,15 +142,20 @@ var demo1SunDir = [-0.69, 1.33, 0.57];
 var demo1SpecularPower = {val: 12.45};
 var demo1HasSpecular = {val: true};
 
- function buildRockMesh (gl, rock) {
+function buildRockMesh (gl, rock) {
 
-    rock.sphereGeo = Geometry(gl)
+    rock.rockGeo = Geometry(gl)
         .attr('aPosition', rock.positions)
         .attr('aNormal',
             rock.normals
         )
         .faces(rock.cells);
 }
+
+function isRockMeshBuilt(rock) {
+    return "rockGeo" in rock;
+}
+
 
  function drawRock(shader, view, projection, showTexture, translation, rock) {
     var scratchVec = vec3.create();
@@ -184,11 +189,16 @@ var demo1HasSpecular = {val: true};
     shader.uniforms.uShowTexture = showTexture;
 
 
-    rock.sphereGeo.bind(shader);
-    rock.sphereGeo.draw();
-}
+    rock.rockGeo.bind(shader);
+    rock.rockGeo.draw();
+     rock.rockGeo.unbind();
+
+ }
 
 module.exports.createRock = Rock;
 module.exports.buildRockMesh = buildRockMesh;
 module.exports.drawRock = drawRock;
+module.exports.isRockMeshBuilt = isRockMeshBuilt;
+
+
 

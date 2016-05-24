@@ -23,6 +23,10 @@ var RockObj = require('./rock_obj.js');
 var createRock = require('./rock.js').createRock;
 var buildRockMesh = require('./rock.js').buildRockMesh;
 var drawRock = require('./rock.js').drawRock;
+var isRockMeshBuilt = require('./rock.js').isRockMeshBuilt;
+
+
+
 
 var randomArray = require('random-array');
 
@@ -50,7 +54,7 @@ var ROCK_SPACING = 4;
 var rocks;
 
 var camera = createMovableCamera({
-    position: vec3.fromValues(-2.0, 6.0, 0.0),
+    position: vec3.fromValues(-5.0, 6.0, 0.0),
     viewDir: vec3.fromValues(1.0, -0.3, 0)
 });
 
@@ -90,7 +94,6 @@ shell.on("gl-init", function () {
 
             var rock = msg.data[1];
 
-            buildRockMesh(gl, rock);
             rocks.push(rock);
 
             workers[msg.data[0]].postMessage(msg.data[0]);
@@ -178,7 +181,7 @@ shell.on("gl-render", function (t) {
 
     rockShader.bind();
 
-    for(var i = 0; i < /*ROCK_W*ROCK_H*/ rocks.length; ++i) {
+    for(var i = 0; i < rocks.length; ++i) {
 
 
         var w = Math.floor(i / ROCK_H);
@@ -187,19 +190,28 @@ shell.on("gl-render", function (t) {
         var translation = [(w) * ROCK_SPACING, 0.0, (h - ROCK_H / 2.0) * ROCK_SPACING];
         
         var rock = rocks[w * ROCK_H +h];
+
+
+
+        if(!isRockMeshBuilt(rock)) {
+            buildRockMesh(gl, rock);
+        }
+
         drawRock(rockShader, view, projection, showTexture.val, translation, rock);
-
-
     }
 
-  /*  planeShader.bind();
+
+
+
+    planeShader.bind();
 
     planeShader.uniforms.uView = view;
     planeShader.uniforms.uProjection = projection;
 
     planeGeo.bind(planeShader);
     planeGeo.draw();
-*/
+    planeGeo.unbind();
+
 
 
 });
@@ -214,7 +226,7 @@ shell.on("tick", function () {
 
         // if not free camera, make the camera traverse a set path.
 
-        //camera.position[0] += 0.1;
+        camera.position[0] += 0.1;
 
     } else {
         // if free camera, listen to keyboard and mouse input.
