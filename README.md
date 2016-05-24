@@ -28,9 +28,14 @@ The camera in the demo is controlled as follows:
 
 If you are modifying the mesh parameters(The "edit mode" is "mesh"), then the mesh will not update real-time. You must click the button "Update Rock", or the keyboard key "P", in order to update the rock. 
 
-Next, we explain some parameters of the rock editor.
+Next, we explain some parameters of the rock editor. For more details on these parameters, see the  [Explanation](https://github.com/Erkaman/gl-rock#explanation) 
 
-* TODO
+* `Noise Scale` controls the scale of the noise that is applied after all the scraping has been done.
+* `Noise Strength` controls the strength(amplitude of the above noise.
+* `Scrape Count` controls how many times the mesh is scraped(flattened)
+* `Scrape Min Dist` The minimum distance between all the randomly selected spots that are scraped.
+* `Scrape Radius`. Are randomly selected spot is selected for scraping. All vertices that are within the distance `Scrape Radius` from that spot is also affected by the scraping.
+* `Scrape Strength` How deeply we should scrape.
 
 
 
