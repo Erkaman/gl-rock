@@ -65,6 +65,28 @@ And we can easily project vertices onto a plane by using some elementary linear 
 
 Once we have randomly scraped the sphere mesh, we use a Perlin noise to randomly distort the vertices a little bit. Finally, the rock texture is then generated with a Perlin noise in a fragment shader. This means that we are basically generating the texture in real time, which, unfortunately, also means that it is very taxing to render the rock on lower-end GPUs.
 
+## Build
+
+To run the demos locally on your computer, first change your directory to the directory of the project, then run
+
+```bash
+npm install
+```
+
+To then run demo 1, do this:
+
+```bash
+budo --verbose example/index1.js -t glslify --live --open
+```
+
+and the demo will automatically open in a tab in your browser.(but you must install [budo](https://github.com/mattdesl/budo) for this to work). 
+
+To run demo 2, do this:
+
+```bash
+budo --verbose example/index2.js -t glslify --live --open
+```
+
 
 ## TODO
 
