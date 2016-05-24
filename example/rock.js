@@ -1,12 +1,13 @@
 var cameraPosFromViewMatrix = require('gl-camera-pos-from-view-matrix');
-var scrape = require('./scrape.js');
 var vec3 = require('gl-vec3');
 var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var seedRandom = require('seed-random');
-var createSphere = require('./sphere.js');
 var tooloud = require ('tooloud');
 var mat4 = require('gl-mat4');
+
+var createSphere = require('./sphere.js');
+var scrape = require('./scrape.js');
 
 var adjacentVertices = null;
 var adjacentFaces = null;

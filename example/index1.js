@@ -9,8 +9,9 @@ var shell = require("gl-now")();
 var createGui = require("pnp-gui");
 var randomArray = require('random-array');
 var randomItem = require('random-item');
-var RockObj = require('./rock_obj.js');
 var createPlane = require('primitive-plane');
+
+var RockObj = require('./rock_obj.js');
 
 var createRock = require('./rock.js').createRock;
 var buildRockMesh = require('./rock.js').buildRockMesh;

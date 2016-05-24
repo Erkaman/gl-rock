@@ -4,7 +4,6 @@ var mat4 = require('gl-mat4');
 var vec3 = require('gl-vec3');
 var glShader = require('gl-shader');
 var glslify = require('glslify');
-var createOrbitCamera = require('orbit-camera');
 var shell = require("gl-now")();
 var randomItem = require('random-item');
 var createMovableCamera = require('gl-movable-camera');
@@ -13,7 +12,6 @@ var createNormals = require('normals');
 var Geometry = require('gl-geometry');
 var arrayShuffle = require('array-shuffle');
 var geoTransform = require('geo-3d-transform-mat4');
-var WorkerJs = require('workerjs');
 var Work = require('webworkify');
 
 var RockObj = require('./rock_obj.js');
