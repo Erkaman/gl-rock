@@ -61,7 +61,20 @@ Now, all vertices that are on one side of the plane are left untouched, but the 
 
 <img src="images/c4.png" width="300" height="300" />
 
-And we can easily project vertices onto a plane by using some elementary linear algebra. For more details, see the source code in `example/scrape.js`.
+And we can easily project vertices onto a plane by using some elementary linear algebra. 
+
+But by using this approach, we cannot create concave rocks. However, by slightly modifying the approach, we can do this as well. Instead of defining a plane in 3D space, we define a circular disk in 3D space:
+
+<img src="images/c5.png" width="300" height="300" />
+
+Just like before, we now project all vertices under this disk onto the disk. However, we make sure that all vertices that are too far from the center of the disk are left untouched. By doing this, the vertices are projected onto a disk, and we can also create concave rocks:
+
+<img src="images/c6.png" width="300" height="300" />
+
+
+For more details, see the source code in `example/scrape.js`.
+
+
 
 Once we have randomly scraped the sphere mesh, we use a Perlin noise to randomly distort the vertices a little bit. Finally, the rock texture is then generated with a Perlin noise in a fragment shader. This means that we are basically generating the texture in real time, which, unfortunately, also means that it is very taxing to render the rock on lower-end GPUs.
 
