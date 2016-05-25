@@ -67,7 +67,7 @@ But by using this approach, we cannot create concave rocks. However, by slightly
 
 <img src="images/c5.png" width="300" height="300" />
 
-Just like before, we now project all vertices under this disk onto the disk. However, we make sure that all vertices that are too far from the center of the disk are left untouched. By doing this, the vertices are projected onto a disk, and we can also create concave rocks:
+Just like before, we now project all vertices under this disk onto the disk. However, we make sure that all vertices that are too far from the center of the disk are left untouched. By doing this, the vertices are projected onto a disk, and we are thus able to create concave rocks:
 
 <img src="images/c6.png" width="300" height="300" />
 
