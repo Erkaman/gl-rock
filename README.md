@@ -89,15 +89,15 @@ npm install
 To then run demo 1, do this:
 
 ```bash
-budo --verbose example/index1.js -t glslify --live --open
+npm run demo1
 ```
 
-and the demo will automatically open in a tab in your browser.(but you must install [budo](https://github.com/mattdesl/budo) for this to work). 
+and the demo will automatically open in a tab in your browser.
 
 To run demo 2, do this:
 
 ```bash
-budo --verbose example/index2.js -t glslify --live --open
+npm run demo2
 ```
 
 
